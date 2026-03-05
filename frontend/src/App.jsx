@@ -55,6 +55,7 @@ export default function App() {
   const [historyPage, setHistoryPage] = useState(1)
   const [loadedFromHistory, setLoadedFromHistory] = useState(false)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
+  const [showHeaderMenu, setShowHeaderMenu] = useState(false)
   const [showFormValidation, setShowFormValidation] = useState(false)
   const [displayCurrency, setDisplayCurrency] = useState('AUD')
   const [fxRate, setFxRate] = useState(1)
@@ -481,24 +482,48 @@ export default function App() {
         <section className="panel">
           <div className="header-row">
             <h1>Franchise Financial Simulator</h1>
-            <div className="header-actions">
+            <div className="header-controls">
               <button
-                className="theme-toggle header-btn"
+                className="theme-toggle menu-toggle"
                 type="button"
-                onClick={() => setShowHistoryPanel(true)}
+                aria-label="Toggle quick actions menu"
+                onClick={() => setShowHeaderMenu((prev) => !prev)}
               >
-                History
+                ☰ Menu
               </button>
-              <button
-                className="theme-toggle header-btn"
-                type="button"
-                onClick={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
-              >
-                {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
-              </button>
-              <button className="primary header-btn" onClick={loadedFromHistory ? handleCreateNewSimulation : handleSubmit} type="button">
-                {loadedFromHistory ? 'Create New Simulation' : 'Run Simulation'}
-              </button>
+
+              <div className={`header-actions ${showHeaderMenu ? 'open' : ''}`}>
+                <button
+                  className="theme-toggle header-btn"
+                  type="button"
+                  onClick={() => {
+                    setShowHistoryPanel(true)
+                    setShowHeaderMenu(false)
+                  }}
+                >
+                  History
+                </button>
+                <button
+                  className="theme-toggle header-btn"
+                  type="button"
+                  onClick={() => {
+                    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
+                    setShowHeaderMenu(false)
+                  }}
+                >
+                  {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                </button>
+                <button
+                  className="primary header-btn"
+                  onClick={() => {
+                    ;(loadedFromHistory ? handleCreateNewSimulation : handleSubmit)()
+                    setShowHeaderMenu(false)
+                  }}
+                  type="button"
+                >
+                  {loadedFromHistory ? 'Create New Simulation' : 'Run Simulation'}
+                </button>
+              </div>
             </div>
           </div>
 
