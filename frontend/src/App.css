@@ -148,6 +148,7 @@ select {
   font-size: 0.92rem;
   background: var(--input-bg);
   color: var(--text);
+  min-height: 44px;
 }
 
 input:focus {
@@ -239,9 +240,10 @@ input:focus {
   background: var(--pill-bg);
   color: var(--pill-text);
   border-radius: 999px;
-  padding: 7px 12px;
+  padding: 9px 12px;
   cursor: pointer;
   font-weight: 600;
+  min-height: 40px;
 }
 
 .pill.active {
@@ -298,8 +300,106 @@ th { background: var(--table-head); color: var(--muted); }
   .history-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 900px) {
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .header-btn {
+    min-width: 0;
+    flex: 1 1 180px;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 700px) {
-  .history-grid { grid-template-columns: 1fr; }
+  #root {
+    padding: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 1.05rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .header-btn,
+  .primary,
+  .theme-toggle,
+  .history-btn,
+  .history-page-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .result-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .pill {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .report-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .currency-select-label {
+    min-width: 0;
+  }
+
+  .report-download-btn {
+    width: 100%;
+  }
+
+  table {
+    min-width: 560px;
+  }
+
+  .history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-drawer {
+    width: 100vw;
+    padding: 12px;
+    border-left: none;
+  }
+
+  .history-pagination {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
 }
 
 
