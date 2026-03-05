@@ -213,6 +213,27 @@ input:focus {
   margin-bottom: 12px;
 }
 
+.report-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.currency-select-label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  min-width: 180px;
+}
+
+.report-download-btn {
+  min-width: 170px;
+}
+
 .pill {
   border: 1px solid var(--pill-border);
   background: var(--pill-bg);
@@ -356,6 +377,13 @@ th { background: var(--table-head); color: var(--muted); }
   margin: 0 0 10px;
   line-height: 1.7;
   color: var(--risk-text);
+  white-space: pre-line;
+}
+
+.matrix-title {
+  margin: 0 0 8px;
+  color: var(--risk-title);
+  font-size: 0.95rem;
 }
 
 .risk-report-card ul {

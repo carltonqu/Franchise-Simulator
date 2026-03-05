@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
+import { jsPDF } from 'jspdf'
 import './App.css'
 
 const HISTORY_KEY = 'franchise_sim_history'
@@ -25,6 +26,20 @@ const getRiskWeight = (level = '') => {
   return 1
 }
 
+const parseMaybeJson = (value) => {
+  if (!value) return null
+  if (typeof value === 'object') return value
+  const text = String(value).trim()
+  if (!text.startsWith('{') && !text.startsWith('[')) return null
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
+const currencyOptions = ['AUD', 'USD', 'PHP', 'EUR', 'CNY', 'SGD', 'JPY']
+
 export default function App() {
   const [theme, setTheme] = useState('light')
   const [formData, setFormData] = useState(initialFormData)
@@ -41,6 +56,8 @@ export default function App() {
   const [loadedFromHistory, setLoadedFromHistory] = useState(false)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
   const [showFormValidation, setShowFormValidation] = useState(false)
+  const [displayCurrency, setDisplayCurrency] = useState('AUD')
+  const [fxRate, setFxRate] = useState(1)
   const requestControllerRef = useRef(null)
 
   useEffect(() => {
@@ -59,6 +76,26 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('franchise_theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    const fetchRate = async () => {
+      if (displayCurrency === 'AUD') {
+        setFxRate(1)
+        return
+      }
+
+      try {
+        const response = await fetch(`https://api.frankfurter.app/latest?from=AUD&to=${displayCurrency}`)
+        const data = await response.json()
+        const nextRate = data?.rates?.[displayCurrency]
+        setFxRate(Number.isFinite(Number(nextRate)) ? Number(nextRate) : 1)
+      } catch {
+        setFxRate(1)
+      }
+    }
+
+    fetchRate()
+  }, [displayCurrency])
 
   const simulation = useMemo(() => {
     if (!submittedData) return null
@@ -136,7 +173,10 @@ export default function App() {
     return { monthly, scenarios, baseMonthlyRevenue, breakEvenRevenue, breakEvenMonth, paybackMonths, worstCashflowMonth, riskScore, riskLevel, issues }
   }, [submittedData])
 
-  const currency = (n) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n)
+  const currency = (n) => {
+    const converted = Number(n || 0) * fxRate
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: displayCurrency, maximumFractionDigits: 0 }).format(converted)
+  }
 
 
   useEffect(() => {
@@ -296,6 +336,97 @@ export default function App() {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
   }
 
+  const normalizedReport = useMemo(() => {
+    const parsedTop = parseMaybeJson(aiReport)
+    const source = parsedTop || aiReport || {}
+
+    const parsedSummary = parseMaybeJson(source.executiveSummary)
+    const merged = parsedSummary && typeof parsedSummary === 'object' ? { ...source, ...parsedSummary } : source
+
+    const executiveSummary = String(merged.executiveSummary || '').trim()
+    const riskExplanation = String(merged.riskExplanation || '').trim()
+    const actionChecklist = Array.isArray(merged.actionChecklist) ? merged.actionChecklist : []
+
+    return { executiveSummary, riskExplanation, actionChecklist }
+  }, [aiReport])
+
+  const handleDownloadPdf = () => {
+    if (!simulation) return
+
+    const doc = new jsPDF()
+    let y = 12
+    const lineHeight = 7
+    const pageHeight = 280
+
+    const ensureSpace = (space = 18) => {
+      if (y + space > pageHeight) {
+        doc.addPage()
+        y = 12
+      }
+    }
+
+    const addWrapped = (text, indent = 0) => {
+      const lines = doc.splitTextToSize(String(text), 180 - indent)
+      lines.forEach((line) => {
+        ensureSpace()
+        doc.text(line, 10 + indent, y)
+        y += lineHeight
+      })
+    }
+
+    const addHeading = (text) => {
+      ensureSpace()
+      doc.setFontSize(13)
+      doc.text(text, 10, y)
+      y += lineHeight
+      doc.setFontSize(11)
+    }
+
+    doc.setFontSize(16)
+    doc.text('Franchise Simulator Full Report', 10, y)
+    y += 10
+    doc.setFontSize(11)
+    addWrapped(`Brand: ${submittedData?.brandName || 'N/A'} | City: ${submittedData?.city || 'N/A'}`)
+    addWrapped(`Display currency: ${displayCurrency} (1 AUD = ${fxRate.toFixed(4)} ${displayCurrency})`)
+
+    addHeading('Overview')
+    addWrapped(`Base Revenue: ${currency(simulation.baseMonthlyRevenue)}`)
+    addWrapped(`Break-even Revenue: ${simulation.breakEvenRevenue ? currency(simulation.breakEvenRevenue) : 'Invalid'}`)
+    addWrapped(`Payback: ${simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}`)
+    addWrapped(`Worst Cashflow: Month ${simulation.worstCashflowMonth.month} (${currency(simulation.worstCashflowMonth.cashflow)})`)
+    if (normalizedReport.executiveSummary) addWrapped(`Executive Summary: ${normalizedReport.executiveSummary}`)
+    if (normalizedReport.riskExplanation) addWrapped(`Risk Notes: ${normalizedReport.riskExplanation}`)
+
+    addHeading('Financial Actions')
+    const financialRows = normalizedReport.actionChecklist.length
+      ? normalizedReport.actionChecklist.map((solution, index) => ({
+          problem: simulation.issues[index]?.problem || 'General risk observation',
+          solution,
+          priority: simulation.issues[index]?.priority || 'Medium',
+        }))
+      : simulation.issues.map((item) => ({ problem: item.problem, solution: item.solution, priority: item.priority }))
+
+    financialRows.forEach((row, idx) => {
+      addWrapped(`${idx + 1}. [${row.priority}] ${row.problem}`)
+      addWrapped(`Action: ${row.solution}`, 4)
+    })
+
+    addHeading('Scenarios')
+    simulation.scenarios.forEach((scenario, idx) => {
+      addWrapped(`${idx + 1}. ${scenario.name}`)
+      addWrapped(`Revenue: ${currency(scenario.revenue)} | Net Profit: ${currency(scenario.netProfit)}`, 4)
+    })
+
+    addHeading('Cashflows (12 Months)')
+    simulation.monthly.forEach((monthRow) => {
+      addWrapped(
+        `M${monthRow.month}: Revenue ${currency(monthRow.revenue)} | Net ${currency(monthRow.netProfit)} | Cashflow ${currency(monthRow.cashflow)} | Cumulative ${currency(monthRow.cumulativeCash)}`
+      )
+    })
+
+    doc.save(`franchise-report-${Date.now()}.pdf`)
+  }
+
   const filteredHistory = useMemo(() => {
     const q = historySearch.trim().toLowerCase()
     let list = [...history]
@@ -414,6 +545,22 @@ export default function App() {
             ))}
           </div>
 
+          {simulation && (
+            <div className="report-toolbar">
+              <label className="currency-select-label">
+                Currency
+                <select value={displayCurrency} onChange={(e) => setDisplayCurrency(e.target.value)}>
+                  {currencyOptions.map((code) => (
+                    <option value={code} key={code}>{code}</option>
+                  ))}
+                </select>
+              </label>
+              <button type="button" className="primary report-download-btn" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+            </div>
+          )}
+
           {activeResultTab !== 'history' && !simulation ? (
             <p className="empty">No output yet. Enter data and run simulation.</p>
           ) : (
@@ -442,29 +589,14 @@ export default function App() {
                     <article className="risk-kpi"><span>Payback</span><strong>{simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}</strong><em>Based on steady-state net profit</em></article>
                   </div>
 
-                  <section className="risk-report-card">
-                    <h3>Risk Report Summary</h3>
-                    <p>
-                      {aiReport?.executiveSummary || 'This simulation highlights your projected financial position based on the assumptions provided.'}
-                    </p>
-                    <p>
-                      <strong>Key Risk Insight:</strong> {aiReport?.riskExplanation || 'Your main risks are tied to fixed-cost pressure, margin sensitivity, and early-stage cashflow stability.'}
-                    </p>
-                    <ul>
-                      <li><strong>Risk Level:</strong> {simulation.riskLevel}</li>
-                      <li><strong>Risk Score:</strong> {simulation.riskScore}/100</li>
-                      <li><strong>Break-even Month:</strong> {simulation.breakEvenMonth ?? 'Not reached in 12 months'}</li>
-                      <li><strong>Estimated Payback:</strong> {simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable with current assumptions'}</li>
-                    </ul>
-                  </section>
-
                   {aiError && <p className="error-text">{aiError}</p>}
+                  <h4 className="matrix-title">Detailed Risk & Action Matrix</h4>
                   <div className="table-wrap excel-wrap">
                     <table className="excel-table">
                       <thead><tr><th>Risk Report</th><th>Recommended Solution Report</th><th>Priority Status</th></tr></thead>
                       <tbody>
-                        {(aiReport?.actionChecklist?.length
-                          ? aiReport.actionChecklist.map((solution, index) => ({ risk: simulation.issues[index]?.problem || aiReport.riskExplanation || 'General risk observation', solution, priority: simulation.issues[index]?.priority || 'Medium' }))
+                        {(normalizedReport.actionChecklist.length
+                          ? normalizedReport.actionChecklist.map((solution, index) => ({ risk: simulation.issues[index]?.problem || normalizedReport.riskExplanation || 'General risk observation', solution, priority: simulation.issues[index]?.priority || 'Medium' }))
                           : simulation.issues.map((item) => ({ risk: item.problem, solution: item.solution, priority: item.priority }))
                         ).map((row, idx) => (
                           <tr key={`${row.risk}-${idx}`}>
