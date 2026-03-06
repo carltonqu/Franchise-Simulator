@@ -419,7 +419,22 @@ th { background: var(--table-head); color: var(--muted); }
   }
 
   .history-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .history-card {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .history-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-actions {
+    gap: 6px;
   }
 
   .history-overlay {
