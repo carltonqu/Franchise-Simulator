@@ -136,13 +136,32 @@ export default function App() {
     const breakEvenMonth = monthly.find((m) => m.cumulativeCash >= 0)?.month ?? null
     const worstCashflowMonth = monthly.reduce((a, b) => (b.cashflow < a.cashflow ? b : a), monthly[0])
 
+    const scoreScenarioRisk = (monthlyRevenue, monthlyNetProfit, scenarioPaybackMonths) => {
+      let score = 100
+      if (rent / Math.max(monthlyRevenue, 1) > 0.15) score -= 20
+      if (labor / Math.max(monthlyRevenue, 1) > 0.35) score -= 20
+      if (cogs > 0.6) score -= 20
+      if (scenarioPaybackMonths !== null && scenarioPaybackMonths > 36) score -= 25
+      if (monthlyNetProfit < 0) score -= 25
+      return clamp(score, 0, 100)
+    }
+
     const scenarios = [
-      { name: 'Conservative', revenue: baseMonthlyRevenue * 0.85, cogsPct: cogs + 0.02 },
-      { name: 'Base', revenue: baseMonthlyRevenue, cogsPct: cogs },
-      { name: 'Optimistic', revenue: baseMonthlyRevenue * 1.15, cogsPct: Math.max(0, cogs - 0.02) },
+      { name: 'Conservative', ordersPerDay: opd * 0.8, cogsPct: cogs + 0.02 },
+      { name: 'Base Case', ordersPerDay: opd, cogsPct: cogs },
+      { name: 'Optimistic', ordersPerDay: opd * 1.2, cogsPct: Math.max(0, cogs - 0.02) },
     ].map((s) => {
-      const netProfit = s.revenue - s.revenue * s.cogsPct - s.revenue * royalty - s.revenue * marketing - rent - labor
-      return { ...s, netProfit }
+      const revenue = aov * s.ordersPerDay * 30
+      const netProfit = revenue - revenue * s.cogsPct - revenue * royalty - revenue * marketing - rent - labor
+      const scenarioPaybackMonths = netProfit > 0 ? totalInitialInvestment / netProfit : null
+      const scenarioRiskScore = scoreScenarioRisk(revenue, netProfit, scenarioPaybackMonths)
+      return {
+        ...s,
+        revenue,
+        netProfit,
+        paybackMonths: scenarioPaybackMonths,
+        riskScore: scenarioRiskScore,
+      }
     })
 
     const negativeCashflowMonths = monthly.filter((m) => m.cashflow < 0).length
@@ -391,6 +410,18 @@ export default function App() {
 
     return { executiveSummary, riskExplanation, actionChecklist }
   }, [aiReport])
+
+  const dynamicInsight = useMemo(() => {
+    if (!simulation || !submittedData) return ''
+    const dailyOrders = toNumber(submittedData.ordersPerDay)
+    if (dailyOrders < 85 && simulation.paybackMonths === null) {
+      return 'Dynamic insight: If daily orders remain below 85, the business may become unprofitable under current cost structure.'
+    }
+    if (dailyOrders < 85) {
+      return 'Dynamic insight: Daily orders below 85 materially weaken returns and can push the model into high-risk territory.'
+    }
+    return 'Dynamic insight: Current order volume supports positive momentum, but stress-test lower order scenarios before investing.'
+  }, [simulation, submittedData])
 
   const handleDownloadPdf = () => {
     if (!simulation) return
@@ -849,7 +880,34 @@ export default function App() {
               )}
 
               {activeResultTab === 'scenarios' && simulation && (
-                <div className="cards">{simulation.scenarios.map((s) => <article key={s.name}><span>{s.name}</span><strong>Revenue: {currency(s.revenue)}</strong><strong>Net: {currency(s.netProfit)}</strong></article>)}</div>
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Scenario</th>
+                        <th>Revenue</th>
+                        <th>Profit</th>
+                        <th>Payback</th>
+                        <th>Risk Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {simulation.scenarios.map((s) => (
+                        <tr key={s.name}>
+                          <td>{s.name}</td>
+                          <td>{currency(s.revenue)}</td>
+                          <td>{currency(s.netProfit)}</td>
+                          <td>{s.paybackMonths ? `${s.paybackMonths.toFixed(1)} months` : 'Not achievable'}</td>
+                          <td>{s.riskScore}/100</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <p className="scenario-note">
+                    Sensitivity test example: when daily orders move from lower to higher assumptions, payback and risk score update immediately.
+                  </p>
+                </div>
               )}
 
               {activeResultTab === 'financialActions' && simulation && (
@@ -860,6 +918,7 @@ export default function App() {
                   </div>
 
                   {aiError && <p className="error-text">{aiError}</p>}
+                  {dynamicInsight && <p className="dynamic-insight">{dynamicInsight}</p>}
                   <h4 className="matrix-title">Detailed Risk & Action Matrix</h4>
                   <div className="table-wrap excel-wrap">
                     <table className="excel-table">

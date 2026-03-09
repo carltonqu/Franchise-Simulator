@@ -944,6 +944,22 @@ th { background: var(--table-head); color: var(--muted); }
   gap: 6px;
 }
 
+.scenario-note {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.dynamic-insight {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--accent);
+  background: rgba(91, 108, 255, 0.08);
+  border-radius: 8px;
+}
+
 @media (max-width: 700px) {
   .comparison-filters {
     grid-template-columns: 1fr;
