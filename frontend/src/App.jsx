@@ -918,6 +918,7 @@ export default function App() {
                   </div>
 
                   {aiError && <p className="error-text">{aiError}</p>}
+                  {aiReport?.upgradeMessage && <p className="dynamic-insight">{aiReport.upgradeMessage}</p>}
                   {dynamicInsight && <p className="dynamic-insight">{dynamicInsight}</p>}
                   <h4 className="matrix-title">Detailed Risk & Action Matrix</h4>
                   <div className="table-wrap excel-wrap">
