@@ -955,107 +955,64 @@ export default function App() {
                   {aiError && <p className="error-text">{aiError}</p>}
                   {aiReport?.upgradeMessage && <p className="dynamic-insight">{aiReport.upgradeMessage}</p>}
 
-                  <div className="table-wrap excel-wrap">
-                    <table className="excel-table pretty-analysis-table">
-                      <thead>
-                        <tr>
-                          <th>Section</th>
-                          <th>Metric / Field</th>
-                          <th>Value</th>
-                          <th>Insight</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td rowSpan={5}><strong>1) Investment Overview</strong></td>
-                          <td>Business Type</td>
-                          <td>Franchise restaurant</td>
-                          <td>Quick business model snapshot.</td>
-                        </tr>
-                        <tr>
-                          <td>Total Investment</td>
-                          <td>{currency(toNumber(submittedData.totalInitialInvestment))}</td>
-                          <td>Initial capital needed to launch.</td>
-                        </tr>
-                        <tr>
-                          <td>Est. Monthly Revenue</td>
-                          <td>{currency(simulation.baseMonthlyRevenue)}</td>
-                          <td>Top-line expected from current assumptions.</td>
-                        </tr>
-                        <tr>
-                          <td>Est. Monthly Net Profit</td>
-                          <td>{currency(simulation.monthly?.[11]?.netProfit || 0)}</td>
-                          <td>Bottom-line after key recurring costs.</td>
-                        </tr>
-                        <tr>
-                          <td>Estimated Payback</td>
-                          <td>{simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}</td>
-                          <td>Capital recovery speed indicator.</td>
-                        </tr>
+                  <section className="ai-section">
+                    <h3>1) Investment Overview</h3>
+                    <ul>
+                      <li>Business Type: Franchise restaurant</li>
+                      <li>Total Investment: {currency(toNumber(submittedData.totalInitialInvestment))}</li>
+                      <li>Estimated Monthly Revenue: {currency(simulation.baseMonthlyRevenue)}</li>
+                      <li>Estimated Monthly Net Profit: {currency(simulation.monthly?.[11]?.netProfit || 0)}</li>
+                      <li>Estimated Payback: {simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}</li>
+                    </ul>
+                  </section>
 
-                        <tr>
-                          <td rowSpan={2}><strong>2) Financial Health</strong></td>
-                          <td>Health Snapshot</td>
-                          <td>
-                            Profitability: {(simulation.monthly?.[11]?.netProfit || 0) > 0 ? 'Strong' : 'Weak'} | Margin Stability:{' '}
-                            {(simulation.monthly?.[11]?.netProfit || 0) / Math.max(simulation.monthly?.[11]?.revenue || 1, 1) > 0.2 ? 'Moderate' : 'Fragile'} | Cashflow Risk:{' '}
-                            {simulation.riskLevel.includes('Low') ? 'Low' : simulation.riskLevel.includes('Medium') ? 'Moderate' : 'High'}
-                          </td>
-                          <td>AI interprets deterministic results, not recalculating them.</td>
-                        </tr>
-                        <tr>
-                          <td>AI Explanation</td>
-                          <td colSpan={2}>{normalizedReport.riskExplanation || 'The projected margin is healthy, but monitor labor and rent volatility closely.'}</td>
-                        </tr>
+                  <section className="ai-section">
+                    <h3>2) Financial Health</h3>
+                    <p>
+                      Profitability: <strong>{(simulation.monthly?.[11]?.netProfit || 0) > 0 ? 'Strong' : 'Weak'}</strong> | Margin Stability:{' '}
+                      <strong>{(simulation.monthly?.[11]?.netProfit || 0) / Math.max(simulation.monthly?.[11]?.revenue || 1, 1) > 0.2 ? 'Moderate' : 'Fragile'}</strong> | Cashflow Risk:{' '}
+                      <strong>{simulation.riskLevel.includes('Low') ? 'Low' : simulation.riskLevel.includes('Medium') ? 'Moderate' : 'High'}</strong>
+                    </p>
+                    <p>{normalizedReport.riskExplanation || 'The projected margin is healthy, but monitor labor and rent volatility closely.'}</p>
+                  </section>
 
-                        <tr>
-                          <td><strong>3) Top Risk Drivers</strong></td>
-                          <td>Rule Engine Flags</td>
-                          <td colSpan={2}>{simulation.issues.map((item) => item.problem).join(' • ')}</td>
-                        </tr>
+                  <section className="ai-section">
+                    <h3>3) Top Risk Drivers</h3>
+                    <ul>
+                      {simulation.issues.map((item, i) => (
+                        <li key={`${item.problem}-${i}`}>{item.problem}</li>
+                      ))}
+                    </ul>
+                  </section>
 
-                        <tr>
-                          <td rowSpan={2}><strong>4) Market Snapshot</strong></td>
-                          <td>Location Context</td>
-                          <td>{submittedData.city || 'Selected Location'} — Density: {marketSnapshot.density}, Income: {marketSnapshot.income}, Demand: {marketSnapshot.demand}</td>
-                          <td>Market context used for interpretive guidance.</td>
-                        </tr>
-                        <tr>
-                          <td>Market Fit Score</td>
-                          <td>{marketSnapshot.fit} / 10</td>
-                          <td>High-level local fit indicator.</td>
-                        </tr>
+                  <section className="ai-section">
+                    <h3>4) Market Snapshot – {submittedData.city || 'Selected Location'}</h3>
+                    <p>Population density: {marketSnapshot.density} | Income level: {marketSnapshot.income} | Food demand: {marketSnapshot.demand}</p>
+                    <p>Market fit score: <strong>{marketSnapshot.fit} / 10</strong></p>
+                  </section>
 
-                        <tr>
-                          <td rowSpan={3}><strong>5) Sensitivity Analysis</strong></td>
-                          <td>Orders -20%</td>
-                          <td>{sensitivity?.ordersDown20 < 0 ? 'Monthly profit becomes negative' : `Monthly profit: ${currency(sensitivity?.ordersDown20)}`}</td>
-                          <td>Shows downside demand risk.</td>
-                        </tr>
-                        <tr>
-                          <td>Rent +10%</td>
-                          <td>{sensitivity?.rentUp10Payback ? `Payback: ${sensitivity.rentUp10Payback.toFixed(1)} months` : 'Payback not achievable'}</td>
-                          <td>Shows fixed-cost sensitivity.</td>
-                        </tr>
-                        <tr>
-                          <td>Labor +15%</td>
-                          <td>{sensitivity?.laborUp15 < 0 ? 'Margin becomes unsustainable' : `Profit: ${currency(sensitivity?.laborUp15)}`}</td>
-                          <td>Shows labor pressure risk.</td>
-                        </tr>
+                  <section className="ai-section">
+                    <h3>5) Sensitivity Analysis</h3>
+                    <ul>
+                      <li>If orders drop 20% → monthly profit {sensitivity?.ordersDown20 < 0 ? 'becomes negative' : `changes to ${currency(sensitivity?.ordersDown20)}`}</li>
+                      <li>If rent increases 10% → payback {sensitivity?.rentUp10Payback ? `increases to ${sensitivity.rentUp10Payback.toFixed(1)} months` : 'becomes not achievable'}</li>
+                      <li>If labor increases 15% → margin {sensitivity?.laborUp15 < 0 ? 'becomes unsustainable' : `drops with profit at ${currency(sensitivity?.laborUp15)}`}</li>
+                    </ul>
+                  </section>
 
-                        <tr>
-                          <td rowSpan={2}><strong>6) AI Investment Verdict</strong></td>
-                          <td>Verdict</td>
-                          <td>{simulation.riskScore >= 75 ? 'Go' : simulation.riskScore >= 60 ? 'Conditional Go' : 'Caution'}</td>
-                          <td>{normalizedReport.executiveSummary || dynamicInsight}</td>
-                        </tr>
-                        <tr>
-                          <td>Key Recommendations</td>
-                          <td colSpan={2}>{(normalizedReport.actionChecklist.length ? normalizedReport.actionChecklist : simulation.issues.map((x) => x.solution)).slice(0, 3).join(' • ')}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                  <section className="ai-section">
+                    <h3>6) AI Investment Verdict</h3>
+                    <p>
+                      <strong>Investment Verdict: {simulation.riskScore >= 75 ? 'Go' : simulation.riskScore >= 60 ? 'Conditional Go' : 'Caution'}</strong>
+                    </p>
+                    <p>{normalizedReport.executiveSummary || dynamicInsight}</p>
+                    <p><strong>Key Recommendations:</strong></p>
+                    <ul>
+                      {(normalizedReport.actionChecklist.length ? normalizedReport.actionChecklist : simulation.issues.map((x) => x.solution)).slice(0, 3).map((rec, i) => (
+                        <li key={`${rec}-${i}`}>{rec}</li>
+                      ))}
+                    </ul>
+                  </section>
                 </>
               )}
 

@@ -984,16 +984,6 @@ th { background: var(--table-head); color: var(--muted); }
   gap: 6px;
 }
 
-.pretty-analysis-table td,
-.pretty-analysis-table th {
-  vertical-align: top;
-}
-
-.pretty-analysis-table tbody tr td:first-child {
-  min-width: 180px;
-  background: rgba(91, 108, 255, 0.06);
-}
-
 @media (max-width: 700px) {
   .comparison-filters {
     grid-template-columns: 1fr;
