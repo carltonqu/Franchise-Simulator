@@ -56,6 +56,8 @@ export default function App() {
   const [loadedFromHistory, setLoadedFromHistory] = useState(false)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
   const [showFormValidation, setShowFormValidation] = useState(false)
+  const [comparePrimaryId, setComparePrimaryId] = useState(null)
+  const [compareSecondaryIds, setCompareSecondaryIds] = useState([])
   const [displayCurrency, setDisplayCurrency] = useState('AUD')
   const [fxRate, setFxRate] = useState(1)
   const requestControllerRef = useRef(null)
@@ -338,6 +340,41 @@ export default function App() {
     const next = history.filter((h) => h.id !== id)
     setHistory(next)
     localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+
+    if (comparePrimaryId === id) {
+      setComparePrimaryId(null)
+      setCompareSecondaryIds([])
+    } else if (compareSecondaryIds.includes(id)) {
+      setCompareSecondaryIds((prev) => prev.filter((itemId) => itemId !== id))
+    }
+  }
+
+  const handleCompareCardClick = (cardId) => {
+    if (!comparePrimaryId) {
+      setComparePrimaryId(cardId)
+      setCompareSecondaryIds([])
+      return
+    }
+
+    if (comparePrimaryId === cardId) {
+      setComparePrimaryId(null)
+      setCompareSecondaryIds([])
+      return
+    }
+
+    if (compareSecondaryIds.includes(cardId)) {
+      setCompareSecondaryIds((prev) => prev.filter((id) => id !== cardId))
+      return
+    }
+
+    if (compareSecondaryIds.length < 2) {
+      setCompareSecondaryIds((prev) => [...prev, cardId])
+    }
+  }
+
+  const clearCompareSelection = () => {
+    setComparePrimaryId(null)
+    setCompareSecondaryIds([])
   }
 
   const normalizedReport = useMemo(() => {
@@ -479,6 +516,28 @@ export default function App() {
     }
   }, [historyPage, totalHistoryPages])
 
+  const comparedCards = useMemo(() => {
+    const selectedIds = [comparePrimaryId, ...compareSecondaryIds].filter(Boolean)
+
+    return selectedIds
+      .map((id) => history.find((item) => item.id === id))
+      .filter(Boolean)
+      .map((item) => ({
+        ...item,
+        riskScore: Number(item.summary?.riskScore || 0),
+        paybackMonths: Number(item.summary?.paybackMonths || 0),
+        breakEvenMonth: Number(item.summary?.breakEvenMonth || 0),
+      }))
+  }, [comparePrimaryId, compareSecondaryIds, history])
+
+  const comparisonMax = useMemo(() => {
+    return {
+      riskScore: Math.max(1, ...comparedCards.map((card) => card.riskScore || 0)),
+      paybackMonths: Math.max(1, ...comparedCards.map((card) => card.paybackMonths || 0)),
+      breakEvenMonth: Math.max(1, ...comparedCards.map((card) => card.breakEvenMonth || 0)),
+    }
+  }, [comparedCards])
+
   return (
     <main className="layout">
       <section className="main">
@@ -500,14 +559,9 @@ export default function App() {
               >
                 {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
               </button>
-              <button className="primary header-btn" onClick={runSimulation} type="button">
-                Run Simulation
+              <button className="primary header-btn" onClick={loadedFromHistory ? handleCreateNewSimulation : runSimulation} type="button">
+                {loadedFromHistory ? 'Create New Simulation' : 'Run Simulation'}
               </button>
-              {loadedFromHistory && (
-                <button className="theme-toggle header-btn" onClick={handleCreateNewSimulation} type="button">
-                  Create New Simulation
-                </button>
-              )}
             </div>
           </div>
 
@@ -538,9 +592,6 @@ export default function App() {
                 )}
               </label>
             ))}
-            <div className="form-actions">
-              <button type="submit" className="primary">Run Simulation</button>
-            </div>
           </form>
 
           {showFormValidation && (
@@ -664,14 +715,87 @@ export default function App() {
                     <option value="risk_desc">Risk Level (High → Low)</option>
                   </select>
                 </label>
+
+                <div className="compare-control-box">
+                  <h4>Compare Scenarios</h4>
+                  <p>Select 1 base card (green) + up to 2 cards (yellow).</p>
+                  <button type="button" className="history-page-btn" onClick={clearCompareSelection}>Clear Compare Selection</button>
+                </div>
               </aside>
 
               <div className="history-grid-wrap">
+                {comparedCards.length > 0 && (
+                  <section className="compare-dashboard">
+                    <div className="compare-dashboard-head">
+                      <h3>Comparison Dashboard</h3>
+                      <p>Generated report for selected scenarios ({comparedCards.length}/3 selected).</p>
+                    </div>
+
+                    <div className="compare-chart-block">
+                      <h4>Risk Score (higher = safer)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`risk-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div
+                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
+                              style={{ width: `${(card.riskScore / comparisonMax.riskScore) * 100}%` }}
+                            />
+                          </div>
+                          <strong>{card.riskScore}</strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="compare-chart-block">
+                      <h4>Payback Months (lower = better)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`payback-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div
+                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
+                              style={{ width: `${(card.paybackMonths / comparisonMax.paybackMonths) * 100}%` }}
+                            />
+                          </div>
+                          <strong>{card.paybackMonths ? card.paybackMonths.toFixed(1) : 'N/A'}</strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="compare-chart-block">
+                      <h4>Break-even Month (lower = better)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`break-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div
+                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
+                              style={{ width: `${(card.breakEvenMonth / comparisonMax.breakEvenMonth) * 100}%` }}
+                            />
+                          </div>
+                          <strong>{card.breakEvenMonth || 'N/A'}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
                 <div className="history-grid">
                   {filteredHistory.length === 0 ? (
                     <p className="empty">No matching history found.</p>
                   ) : paginatedHistory.map((h) => (
-                    <article className="history-card" key={h.id}>
+                    <article
+                      className={`history-card ${
+                        comparePrimaryId === h.id
+                          ? 'compare-primary-border'
+                          : compareSecondaryIds.includes(h.id)
+                            ? 'compare-secondary-border'
+                            : ''
+                      }`}
+                      key={h.id}
+                      onClick={() => handleCompareCardClick(h.id)}
+                    >
                       <div className="history-card-top">
                         <div>
                           <h4>{h.input.brandName || 'Unnamed Brand'}</h4>
@@ -694,13 +818,13 @@ export default function App() {
                       </div>
 
                       <div className="history-actions">
-                        <button className="history-btn history-btn-load" onClick={() => { loadFromHistory(h); setShowHistoryPanel(false) }}>
+                        <button className="history-btn history-btn-load" onClick={(e) => { e.stopPropagation(); loadFromHistory(h); setShowHistoryPanel(false) }}>
                           <svg className="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path fill="currentColor" d="M10 4a1 1 0 0 1 .8.4L12.7 7H20a2 2 0 0 1 2 2v1H2V7a2 2 0 0 1 2-2h6ZM2 12h20v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5Zm13.6 2.2a1 1 0 0 0-1.4 0L12 16.4l-2.2-2.2a1 1 0 1 0-1.4 1.4l2.9 2.9a1 1 0 0 0 1.4 0l2.9-2.9a1 1 0 0 0 0-1.4Z"/>
                           </svg>
                           <span>Load Scenario</span>
                         </button>
-                        <button className="history-btn history-btn-delete" onClick={() => deleteHistory(h.id)}>
+                        <button className="history-btn history-btn-delete" onClick={(e) => { e.stopPropagation(); deleteHistory(h.id) }}>
                           <svg className="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path fill="currentColor" d="M9 3a1 1 0 0 0-1 1v1H5a1 1 0 1 0 0 2h1v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7h1a1 1 0 1 0 0-2h-3V4a1 1 0 0 0-1-1H9Zm1 2h4v1h-4V5Zm-2 4a1 1 0 1 1 2 0v8a1 1 0 1 1-2 0V9Zm6-1a1 1 0 0 0-1 1v8a1 1 0 1 0 2 0V9a1 1 0 0 0-1-1Z"/>
                           </svg>
