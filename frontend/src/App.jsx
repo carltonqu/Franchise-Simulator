@@ -55,6 +55,7 @@ export default function App() {
   const [historyPage, setHistoryPage] = useState(1)
   const [loadedFromHistory, setLoadedFromHistory] = useState(false)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
+  const [showComparePage, setShowComparePage] = useState(false)
   const [showFormValidation, setShowFormValidation] = useState(false)
   const [comparePrimaryId, setComparePrimaryId] = useState(null)
   const [compareSecondaryIds, setCompareSecondaryIds] = useState([])
@@ -540,7 +541,115 @@ export default function App() {
 
   return (
     <main className="layout">
-      <section className="main">
+      {showComparePage ? (
+        <section className="comparison-page">
+          <div className="comparison-page-header">
+            <h2>Scenario Comparison</h2>
+            <div className="header-actions">
+              <button className="theme-toggle header-btn" type="button" onClick={() => setShowComparePage(false)}>
+                Back to Simulator
+              </button>
+              <button className="theme-toggle header-btn" type="button" onClick={clearCompareSelection}>
+                Clear Selection
+              </button>
+            </div>
+          </div>
+
+          <div className="comparison-layout">
+            <section className="comparison-left">
+              <h3>History Scenarios</h3>
+              <p className="subtitle">Pick 1 base scenario (green) and up to 2 more (yellow).</p>
+              <div className="comparison-history-grid">
+                {filteredHistory.length === 0 ? (
+                  <p className="empty">No history yet. Run simulations first.</p>
+                ) : filteredHistory.map((h) => (
+                  <article
+                    className={`history-card ${
+                      comparePrimaryId === h.id
+                        ? 'compare-primary-border'
+                        : compareSecondaryIds.includes(h.id)
+                          ? 'compare-secondary-border'
+                          : ''
+                    }`}
+                    key={h.id}
+                    onClick={() => handleCompareCardClick(h.id)}
+                  >
+                    <div className="history-card-top">
+                      <div>
+                        <h4>{h.input.brandName || 'Unnamed Brand'}</h4>
+                        <span>{h.input.city || 'Unknown City'}</span>
+                      </div>
+                      <span className={`priority-badge ${(h.summary.riskLevel || '').toLowerCase().includes('high') ? 'high' : (h.summary.riskLevel || '').toLowerCase().includes('medium') ? 'medium' : 'low'}`}>
+                        {h.summary.riskLevel}
+                      </span>
+                    </div>
+                    <div className="history-metrics-grid">
+                      <div className="metric-chip"><span>Risk</span><strong>{h.summary.riskScore}/100</strong></div>
+                      <div className="metric-chip"><span>Payback</span><strong>{h.summary.paybackMonths ? `${h.summary.paybackMonths.toFixed(1)} mo` : 'N/A'}</strong></div>
+                      <div className="metric-chip"><span>Break-even</span><strong>{h.summary.breakEvenMonth ?? 'N/A'}</strong></div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="comparison-right">
+              <div className="compare-dashboard">
+                <div className="compare-dashboard-head">
+                  <h3>Comparison Result</h3>
+                  <p>{comparedCards.length === 3 ? 'Full 3-scenario comparison report' : `Select ${3 - comparedCards.length} more scenario(s) to complete 3-way comparison.`}</p>
+                </div>
+
+                {comparedCards.length > 0 ? (
+                  <>
+                    <div className="compare-chart-block">
+                      <h4>Risk Score (higher = safer)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`risk-page-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`} style={{ width: `${(card.riskScore / comparisonMax.riskScore) * 100}%` }} />
+                          </div>
+                          <strong>{card.riskScore}</strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="compare-chart-block">
+                      <h4>Payback Months (lower = better)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`payback-page-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`} style={{ width: `${(card.paybackMonths / comparisonMax.paybackMonths) * 100}%` }} />
+                          </div>
+                          <strong>{card.paybackMonths ? card.paybackMonths.toFixed(1) : 'N/A'}</strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="compare-chart-block">
+                      <h4>Break-even Month (lower = better)</h4>
+                      {comparedCards.map((card) => (
+                        <div className="compare-chart-row" key={`break-page-${card.id}`}>
+                          <span>{card.input.brandName || 'Unnamed'}</span>
+                          <div className="compare-chart-track">
+                            <div className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`} style={{ width: `${(card.breakEvenMonth / comparisonMax.breakEvenMonth) * 100}%` }} />
+                          </div>
+                          <strong>{card.breakEvenMonth || 'N/A'}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="empty">Select scenarios from the left panel to generate comparison report.</p>
+                )}
+              </div>
+            </section>
+          </div>
+        </section>
+      ) : (
+        <section className="main">
         <section className="panel">
           <div className="header-row">
             <h1>Franchise Financial Simulator</h1>
@@ -551,6 +660,13 @@ export default function App() {
                 onClick={() => setShowHistoryPanel(true)}
               >
                 History
+              </button>
+              <button
+                className="theme-toggle header-btn"
+                type="button"
+                onClick={() => setShowComparePage(true)}
+              >
+                Compare Scenarios
               </button>
               <button
                 className="theme-toggle header-btn"
@@ -684,6 +800,7 @@ export default function App() {
           )}
         </section>
       </section>
+      )}
 
       {showHistoryPanel && (
         <div className="history-overlay" onClick={() => setShowHistoryPanel(false)}>
@@ -716,86 +833,14 @@ export default function App() {
                   </select>
                 </label>
 
-                <div className="compare-control-box">
-                  <h4>Compare Scenarios</h4>
-                  <p>Select 1 base card (green) + up to 2 cards (yellow).</p>
-                  <button type="button" className="history-page-btn" onClick={clearCompareSelection}>Clear Compare Selection</button>
-                </div>
               </aside>
 
               <div className="history-grid-wrap">
-                {comparedCards.length > 0 && (
-                  <section className="compare-dashboard">
-                    <div className="compare-dashboard-head">
-                      <h3>Comparison Dashboard</h3>
-                      <p>Generated report for selected scenarios ({comparedCards.length}/3 selected).</p>
-                    </div>
-
-                    <div className="compare-chart-block">
-                      <h4>Risk Score (higher = safer)</h4>
-                      {comparedCards.map((card) => (
-                        <div className="compare-chart-row" key={`risk-${card.id}`}>
-                          <span>{card.input.brandName || 'Unnamed'}</span>
-                          <div className="compare-chart-track">
-                            <div
-                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
-                              style={{ width: `${(card.riskScore / comparisonMax.riskScore) * 100}%` }}
-                            />
-                          </div>
-                          <strong>{card.riskScore}</strong>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="compare-chart-block">
-                      <h4>Payback Months (lower = better)</h4>
-                      {comparedCards.map((card) => (
-                        <div className="compare-chart-row" key={`payback-${card.id}`}>
-                          <span>{card.input.brandName || 'Unnamed'}</span>
-                          <div className="compare-chart-track">
-                            <div
-                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
-                              style={{ width: `${(card.paybackMonths / comparisonMax.paybackMonths) * 100}%` }}
-                            />
-                          </div>
-                          <strong>{card.paybackMonths ? card.paybackMonths.toFixed(1) : 'N/A'}</strong>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="compare-chart-block">
-                      <h4>Break-even Month (lower = better)</h4>
-                      {comparedCards.map((card) => (
-                        <div className="compare-chart-row" key={`break-${card.id}`}>
-                          <span>{card.input.brandName || 'Unnamed'}</span>
-                          <div className="compare-chart-track">
-                            <div
-                              className={`compare-chart-bar ${comparePrimaryId === card.id ? 'compare-primary-bar' : 'compare-secondary-bar'}`}
-                              style={{ width: `${(card.breakEvenMonth / comparisonMax.breakEvenMonth) * 100}%` }}
-                            />
-                          </div>
-                          <strong>{card.breakEvenMonth || 'N/A'}</strong>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
                 <div className="history-grid">
                   {filteredHistory.length === 0 ? (
                     <p className="empty">No matching history found.</p>
                   ) : paginatedHistory.map((h) => (
-                    <article
-                      className={`history-card ${
-                        comparePrimaryId === h.id
-                          ? 'compare-primary-border'
-                          : compareSecondaryIds.includes(h.id)
-                            ? 'compare-secondary-border'
-                            : ''
-                      }`}
-                      key={h.id}
-                      onClick={() => handleCompareCardClick(h.id)}
-                    >
+                    <article className="history-card" key={h.id}>
                       <div className="history-card-top">
                         <div>
                           <h4>{h.input.brandName || 'Unnamed Brand'}</h4>
