@@ -196,7 +196,7 @@ export default function App() {
   }, [aiReport, submittedData])
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
 
     const hasMissingField = Object.values(formData).some((value) => String(value).trim() === '')
     if (hasMissingField) {
