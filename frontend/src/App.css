@@ -960,6 +960,30 @@ th { background: var(--table-head); color: var(--muted); }
   border-radius: 8px;
 }
 
+.ai-section {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--panel-bg);
+}
+
+.ai-section h3 {
+  margin: 0 0 8px;
+}
+
+.ai-section p {
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.ai-section ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
 @media (max-width: 700px) {
   .comparison-filters {
     grid-template-columns: 1fr;

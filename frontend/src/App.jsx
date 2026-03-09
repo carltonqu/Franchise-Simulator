@@ -423,6 +423,46 @@ export default function App() {
     return 'Dynamic insight: Current order volume supports positive momentum, but stress-test lower order scenarios before investing.'
   }, [simulation, submittedData])
 
+  const marketSnapshot = useMemo(() => {
+    const city = String(submittedData?.city || '').toLowerCase()
+    if (!city) return { density: 'Unknown', income: 'Unknown', demand: 'Unknown', fit: 6.5 }
+
+    if (city.includes('manila') || city.includes('makati') || city.includes('quezon')) {
+      return { density: 'High', income: 'Medium', demand: 'Strong', fit: 7.5 }
+    }
+    if (city.includes('sydney') || city.includes('melbourne') || city.includes('brisbane')) {
+      return { density: 'High', income: 'High', demand: 'Strong', fit: 8.1 }
+    }
+    return { density: 'Medium', income: 'Medium', demand: 'Moderate', fit: 6.8 }
+  }, [submittedData])
+
+  const sensitivity = useMemo(() => {
+    if (!submittedData || !simulation) return null
+
+    const revenue = simulation.baseMonthlyRevenue
+    const rent = toNumber(submittedData.monthlyRent)
+    const labor = toNumber(submittedData.monthlyLaborCost)
+    const cogs = toNumber(submittedData.cogsPercent) / 100
+    const royalty = toNumber(submittedData.royaltyPercent) / 100
+    const marketing = toNumber(submittedData.marketingFeePercent) / 100
+    const investment = toNumber(submittedData.totalInitialInvestment)
+
+    const calcProfit = (rev, r, l) => rev - rev * cogs - rev * royalty - rev * marketing - r - l
+
+    const profitOrdersDown = calcProfit(revenue * 0.8, rent, labor)
+    const paybackRentUp = (() => {
+      const p = calcProfit(revenue, rent * 1.1, labor)
+      return p > 0 ? investment / p : null
+    })()
+    const profitLaborUp = calcProfit(revenue, rent, labor * 1.15)
+
+    return {
+      ordersDown20: profitOrdersDown,
+      rentUp10Payback: paybackRentUp,
+      laborUp15: profitLaborUp,
+    }
+  }, [submittedData, simulation])
+
   const handleDownloadPdf = () => {
     if (!simulation) return
 
@@ -912,38 +952,67 @@ export default function App() {
 
               {activeResultTab === 'financialActions' && simulation && (
                 <>
-                  <div className="risk-top-cards">
-                    <article className="risk-kpi"><span>Risk Score</span><strong>{simulation.riskScore}/100</strong><em>{simulation.riskLevel}</em></article>
-                    <article className="risk-kpi"><span>Payback</span><strong>{simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}</strong><em>Based on steady-state net profit</em></article>
-                  </div>
-
                   {aiError && <p className="error-text">{aiError}</p>}
                   {aiReport?.upgradeMessage && <p className="dynamic-insight">{aiReport.upgradeMessage}</p>}
-                  {dynamicInsight && <p className="dynamic-insight">{dynamicInsight}</p>}
-                  <h4 className="matrix-title">Detailed Risk & Action Matrix</h4>
-                  <div className="table-wrap excel-wrap">
-                    <table className="excel-table">
-                      <thead><tr><th>Risk Report</th><th>Recommended Solution Report</th><th>Priority Status</th></tr></thead>
-                      <tbody>
-                        {(normalizedReport.actionChecklist.length
-                          ? normalizedReport.actionChecklist.map((solution, index) => ({ risk: simulation.issues[index]?.problem || normalizedReport.riskExplanation || 'General risk observation', solution, priority: simulation.issues[index]?.priority || 'Medium' }))
-                          : simulation.issues.map((item) => ({ risk: item.problem, solution: item.solution, priority: item.priority }))
-                        ).map((row, idx) => (
-                          <tr key={`${row.risk}-${idx}`}>
-                            <td>
-                              <p className="risk-item-title">{row.risk}</p>
-                              <ul className="risk-item-points">
-                                <li>Impact: May reduce profitability and increase cash pressure.</li>
-                                <li>Recommendation: Resolve this risk before scaling operations.</li>
-                              </ul>
-                            </td>
-                            <td>{row.solution}</td>
-                            <td><span className={`priority-badge ${row.priority.toLowerCase()}`}>{row.priority}</span></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+
+                  <section className="ai-section">
+                    <h3>1) Investment Overview</h3>
+                    <ul>
+                      <li>Business Type: Franchise restaurant</li>
+                      <li>Total Investment: {currency(toNumber(submittedData.totalInitialInvestment))}</li>
+                      <li>Estimated Monthly Revenue: {currency(simulation.baseMonthlyRevenue)}</li>
+                      <li>Estimated Monthly Net Profit: {currency(simulation.monthly?.[11]?.netProfit || 0)}</li>
+                      <li>Estimated Payback: {simulation.paybackMonths ? `${simulation.paybackMonths.toFixed(1)} months` : 'Not achievable'}</li>
+                    </ul>
+                  </section>
+
+                  <section className="ai-section">
+                    <h3>2) Financial Health</h3>
+                    <p>
+                      Profitability: <strong>{(simulation.monthly?.[11]?.netProfit || 0) > 0 ? 'Strong' : 'Weak'}</strong> | Margin Stability:{' '}
+                      <strong>{(simulation.monthly?.[11]?.netProfit || 0) / Math.max(simulation.monthly?.[11]?.revenue || 1, 1) > 0.2 ? 'Moderate' : 'Fragile'}</strong> | Cashflow Risk:{' '}
+                      <strong>{simulation.riskLevel.includes('Low') ? 'Low' : simulation.riskLevel.includes('Medium') ? 'Moderate' : 'High'}</strong>
+                    </p>
+                    <p>{normalizedReport.riskExplanation || 'The projected margin is healthy, but monitor labor and rent volatility closely.'}</p>
+                  </section>
+
+                  <section className="ai-section">
+                    <h3>3) Top Risk Drivers</h3>
+                    <ul>
+                      {simulation.issues.map((item, i) => (
+                        <li key={`${item.problem}-${i}`}>{item.problem}</li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section className="ai-section">
+                    <h3>4) Market Snapshot – {submittedData.city || 'Selected Location'}</h3>
+                    <p>Population density: {marketSnapshot.density} | Income level: {marketSnapshot.income} | Food demand: {marketSnapshot.demand}</p>
+                    <p>Market fit score: <strong>{marketSnapshot.fit} / 10</strong></p>
+                  </section>
+
+                  <section className="ai-section">
+                    <h3>5) Sensitivity Analysis</h3>
+                    <ul>
+                      <li>If orders drop 20% → monthly profit {sensitivity?.ordersDown20 < 0 ? 'becomes negative' : `changes to ${currency(sensitivity?.ordersDown20)}`}</li>
+                      <li>If rent increases 10% → payback {sensitivity?.rentUp10Payback ? `increases to ${sensitivity.rentUp10Payback.toFixed(1)} months` : 'becomes not achievable'}</li>
+                      <li>If labor increases 15% → margin {sensitivity?.laborUp15 < 0 ? 'becomes unsustainable' : `drops with profit at ${currency(sensitivity?.laborUp15)}`}</li>
+                    </ul>
+                  </section>
+
+                  <section className="ai-section">
+                    <h3>6) AI Investment Verdict</h3>
+                    <p>
+                      <strong>Investment Verdict: {simulation.riskScore >= 75 ? 'Go' : simulation.riskScore >= 60 ? 'Conditional Go' : 'Caution'}</strong>
+                    </p>
+                    <p>{normalizedReport.executiveSummary || dynamicInsight}</p>
+                    <p><strong>Key Recommendations:</strong></p>
+                    <ul>
+                      {(normalizedReport.actionChecklist.length ? normalizedReport.actionChecklist : simulation.issues.map((x) => x.solution)).slice(0, 3).map((rec, i) => (
+                        <li key={`${rec}-${i}`}>{rec}</li>
+                      ))}
+                    </ul>
+                  </section>
                 </>
               )}
 
