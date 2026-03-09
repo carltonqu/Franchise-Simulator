@@ -195,9 +195,7 @@ export default function App() {
     })
   }, [aiReport, submittedData])
 
-  const handleSubmit = (e) => {
-    e?.preventDefault?.()
-
+  const runSimulation = () => {
     const hasMissingField = Object.values(formData).some((value) => String(value).trim() === '')
     if (hasMissingField) {
       setShowFormValidation(true)
@@ -210,9 +208,15 @@ export default function App() {
     setSubmittedData(formData)
     setAiReport(null)
     setAiError('')
+    setAiLoading(true)
     setAutoGeneratePending(true)
     setLoadedFromHistory(false)
     setActiveResultTab('financialActions')
+  }
+
+  const handleSubmit = (e) => {
+    e?.preventDefault?.()
+    runSimulation()
   }
 
   const handleCreateNewSimulation = () => {
@@ -496,9 +500,14 @@ export default function App() {
               >
                 {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
               </button>
-              <button className="primary header-btn" onClick={loadedFromHistory ? handleCreateNewSimulation : handleSubmit} type="button">
-                {loadedFromHistory ? 'Create New Simulation' : 'Run Simulation'}
+              <button className="primary header-btn" onClick={runSimulation} type="button">
+                Run Simulation
               </button>
+              {loadedFromHistory && (
+                <button className="theme-toggle header-btn" onClick={handleCreateNewSimulation} type="button">
+                  Create New Simulation
+                </button>
+              )}
             </div>
           </div>
 
@@ -529,6 +538,9 @@ export default function App() {
                 )}
               </label>
             ))}
+            <div className="form-actions">
+              <button type="submit" className="primary">Run Simulation</button>
+            </div>
           </form>
 
           {showFormValidation && (
