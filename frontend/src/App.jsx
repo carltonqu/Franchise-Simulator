@@ -582,10 +582,33 @@ export default function App() {
             <section className="comparison-left">
               <h3>History Scenarios</h3>
               <p className="subtitle">Pick 1 base scenario (green) and up to 2 more (yellow).</p>
+
+              <div className="comparison-filters">
+                <label>
+                  Search
+                  <input
+                    type="text"
+                    placeholder="Search brand or city"
+                    value={historySearch}
+                    onChange={(e) => setHistorySearch(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Sort by
+                  <select value={historySort} onChange={(e) => setHistorySort(e.target.value)}>
+                    <option value="date_desc">Date (Newest)</option>
+                    <option value="date_asc">Date (Oldest)</option>
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="risk_desc">Risk Level (High → Low)</option>
+                  </select>
+                </label>
+              </div>
+
               <div className="comparison-history-grid">
                 {filteredHistory.length === 0 ? (
                   <p className="empty">No history yet. Run simulations first.</p>
-                ) : filteredHistory.map((h) => (
+                ) : paginatedHistory.map((h) => (
                   <article
                     className={`history-card ${
                       comparePrimaryId === h.id
@@ -614,6 +637,30 @@ export default function App() {
                   </article>
                 ))}
               </div>
+
+              {filteredHistory.length > HISTORY_PAGE_SIZE && (
+                <div className="history-pagination">
+                  <button
+                    className="history-page-btn"
+                    type="button"
+                    disabled={historyPage === 1}
+                    onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                  >
+                    Previous
+                  </button>
+
+                  <span className="history-page-indicator">Page {historyPage} of {totalHistoryPages}</span>
+
+                  <button
+                    className="history-page-btn"
+                    type="button"
+                    disabled={historyPage === totalHistoryPages}
+                    onClick={() => setHistoryPage((p) => Math.min(totalHistoryPages, p + 1))}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </section>
 
             <section className="comparison-right">
