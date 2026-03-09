@@ -896,6 +896,28 @@ th { background: var(--table-head); color: var(--muted); }
   }
 }
 
+.compare-text-report {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.compare-text-report h4 {
+  margin: 0 0 8px;
+}
+
+.compare-text-report p {
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.compare-text-report ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
 @media (max-width: 700px) {
   .comparison-history-grid {
     grid-template-columns: 1fr;

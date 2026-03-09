@@ -539,6 +539,29 @@ export default function App() {
     }
   }, [comparedCards])
 
+  const comparisonNarrative = useMemo(() => {
+    if (comparedCards.length === 0) return null
+
+    const byRisk = [...comparedCards].sort((a, b) => b.riskScore - a.riskScore)
+    const byPayback = [...comparedCards].sort((a, b) => {
+      const aVal = a.paybackMonths || Number.POSITIVE_INFINITY
+      const bVal = b.paybackMonths || Number.POSITIVE_INFINITY
+      return aVal - bVal
+    })
+    const byBreakEven = [...comparedCards].sort((a, b) => {
+      const aVal = a.breakEvenMonth || Number.POSITIVE_INFINITY
+      const bVal = b.breakEvenMonth || Number.POSITIVE_INFINITY
+      return aVal - bVal
+    })
+
+    return {
+      topRisk: byRisk[0],
+      bestPayback: byPayback[0],
+      bestBreakEven: byBreakEven[0],
+      spreadRisk: byRisk[0]?.riskScore - byRisk[byRisk.length - 1]?.riskScore,
+    }
+  }, [comparedCards])
+
   return (
     <main className="layout">
       {showComparePage ? (
@@ -640,6 +663,27 @@ export default function App() {
                         </div>
                       ))}
                     </div>
+
+                    {comparisonNarrative && (
+                      <div className="compare-text-report">
+                        <h4>Comparison Report</h4>
+                        <p>
+                          Based on the selected scenarios, <strong>{comparisonNarrative.topRisk?.input?.brandName || 'N/A'}</strong> currently shows the strongest
+                          risk profile with a score of <strong>{comparisonNarrative.topRisk?.riskScore ?? 'N/A'}</strong>.
+                        </p>
+                        <p>
+                          For capital recovery speed, <strong>{comparisonNarrative.bestPayback?.input?.brandName || 'N/A'}</strong> has the shortest payback at{' '}
+                          <strong>{comparisonNarrative.bestPayback?.paybackMonths ? comparisonNarrative.bestPayback.paybackMonths.toFixed(1) : 'N/A'} months</strong>,
+                          while <strong>{comparisonNarrative.bestBreakEven?.input?.brandName || 'N/A'}</strong> reaches break-even earliest at month{' '}
+                          <strong>{comparisonNarrative.bestBreakEven?.breakEvenMonth || 'N/A'}</strong>.
+                        </p>
+                        <ul>
+                          <li>Risk spread across selected scenarios: <strong>{Number.isFinite(comparisonNarrative.spreadRisk) ? comparisonNarrative.spreadRisk : 0}</strong> points.</li>
+                          <li>Higher risk score generally indicates a safer operating profile under current assumptions.</li>
+                          <li>Lower payback and lower break-even month indicate faster recovery and stronger short-term cashflow resilience.</li>
+                        </ul>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="empty">Select scenarios from the left panel to generate comparison report.</p>
