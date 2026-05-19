@@ -932,6 +932,154 @@
       color: var(--text-muted);
     }
 
+    /* Soft Gradient Card Styles */
+    .soft-card {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%);
+      border-radius: 24px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 40px -10px rgba(59, 130, 246, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .soft-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.4), transparent);
+      pointer-events: none;
+    }
+
+    .soft-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 20px 60px -10px rgba(59, 130, 246, 0.25),
+        0 10px 40px -10px rgba(59, 130, 246, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .soft-card-purple {
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #ede9fe 100%);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 40px -10px rgba(139, 92, 246, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .soft-card-purple:hover {
+      box-shadow: 
+        0 20px 60px -10px rgba(139, 92, 246, 0.25),
+        0 10px 40px -10px rgba(139, 92, 246, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .soft-card-orange {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 40px -10px rgba(249, 115, 22, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .soft-card-orange:hover {
+      box-shadow: 
+        0 20px 60px -10px rgba(249, 115, 22, 0.25),
+        0 10px 40px -10px rgba(249, 115, 22, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .soft-card-green {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 40px -10px rgba(34, 197, 94, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .soft-card-green:hover {
+      box-shadow: 
+        0 20px 60px -10px rgba(34, 197, 94, 0.25),
+        0 10px 40px -10px rgba(34, 197, 94, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* 3D Illustration Styles */
+    .illustration-3d {
+      position: relative;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .floating-element {
+      position: absolute;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .floating-element:hover {
+      transform: scale(1.05) translateY(-2px);
+    }
+
+    .main-3d-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 20px 40px rgba(99, 102, 241, 0.3),
+        0 8px 16px rgba(99, 102, 241, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    .main-3d-icon svg {
+      width: 40px;
+      height: 40px;
+      color: white;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .satellite-icon {
+      width: 48px;
+      height: 48px;
+      z-index: 1;
+    }
+
+    .satellite-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .connection-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(59, 130, 246, 0.3));
+      border-radius: 1px;
+    }
+
     /* Animations */
     @keyframes fadeInUp {
       from {
@@ -942,6 +1090,25 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+      animation: float-delayed 4s ease-in-out infinite;
+      animation-delay: 1s;
     }
 
     /* Responsive */
@@ -1164,77 +1331,123 @@
     </div>
   </section>
 
-  <!-- Features Section - New Bento Layout -->
+  <!-- Features Section - Soft Gradient Cards -->
   <section class="section features-section" id="features" style="background: white; padding: 6rem 2rem;">
     <div class="container" style="max-width: 1100px; margin: 0 auto;">
-      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; align-items: start;">
-        <!-- Left Side - Headline -->
-        <div style="position: sticky; top: 100px;">
-          <h2 style="font-size: 2.75rem; font-weight: 700; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.02em;">Ideas. Data. Clarity.<br>Wherever your business goes.</h2>
-          <p style="font-size: 1.125rem; color: var(--text-muted); line-height: 1.7;">Powerful tools to help you evaluate franchise opportunities with confidence, from any device.</p>
+      <div class="section-header" style="margin-bottom: 3rem;">
+        <h2>Everything you need to decide</h2>
+        <p>Powerful tools to help you evaluate franchise opportunities with confidence</p>
+      </div>
+      
+      <!-- Top Row - 3 Cards -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
+        <!-- Card 1 - Revenue/Simulation -->
+        <div class="soft-card">
+          <div class="illustration-3d">
+            <div class="main-3d-icon animate-float" style="width: 72px; height: 72px; border-radius: 20px;">
+              <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="floating-element satellite-icon animate-float-delayed" style="top: 20px; left: 30px;">
+              <svg width="20" height="20" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div class="floating-element satellite-icon" style="bottom: 30px; right: 40px; animation: float 3s ease-in-out infinite; animation-delay: 0.5s;">
+              <svg width="20" height="20" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Steady Revenue</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Predictable payouts, transparent reporting, and continuous optimization for your franchise.</p>
         </div>
         
-        <!-- Right Side - Bento Grid -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <!-- Card 1 -->
-          <div style="background: var(--bg); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border); transition: all 0.3s;" onmouseover="this.style.background='white';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.background='var(--bg)';this.style.boxShadow='none'">
-            <div style="margin-bottom: 1rem;">
-              <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 0.75rem;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                <span style="font-size: 0.75rem; font-weight: 600;">Simulation</span>
-              </div>
+        <!-- Card 2 - Risk/Security -->
+        <div class="soft-card-orange">
+          <div class="illustration-3d">
+            <div class="main-3d-icon animate-float" style="width: 72px; height: 72px; border-radius: 20px; background: linear-gradient(135deg, #f97316, #ea580c);">
+              <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             </div>
-            <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">Success Simulation</h4>
-            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">Run detailed projections based on your specific franchise model and market conditions</p>
-          </div>
-          
-          <!-- Card 2 -->
-          <div style="background: var(--bg); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border); transition: all 0.3s;" onmouseover="this.style.background='white';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.background='var(--bg)';this.style.boxShadow='none'">
-            <div style="margin-bottom: 1rem;">
-              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.375rem 0.625rem; border-radius: 6px; border: 1px solid var(--border);">
-                  <svg width="14" height="14" fill="none" stroke="#ef4444" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                  <span style="font-size: 0.7rem; font-weight: 500;">High Risk</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.375rem 0.625rem; border-radius: 6px; border: 1px solid var(--border);">
-                  <svg width="14" height="14" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <span style="font-size: 0.7rem; font-weight: 500;">Low Risk</span>
-                </div>
-              </div>
+            <div class="floating-element satellite-icon animate-float-delayed" style="top: 25px; right: 35px;">
+              <span style="font-size: 0.65rem; font-weight: 700; color: #f97316; padding: 0.25rem 0.5rem; background: rgba(249, 115, 22, 0.1); border-radius: 4px;">SDK Free</span>
             </div>
-            <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">Risk Detection</h4>
-            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">Identify potential problems before they become expensive mistakes</p>
+            <div class="floating-element satellite-icon" style="bottom: 25px; left: 35px; animation: float 3s ease-in-out infinite; animation-delay: 0.7s;">
+              <span style="font-size: 0.65rem; font-weight: 700; color: #ea580c; padding: 0.25rem 0.5rem; background: rgba(234, 88, 12, 0.1); border-radius: 4px;">Privacy-First</span>
+            </div>
           </div>
-          
-          <!-- Card 3 -->
-          <div style="background: var(--bg); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border); transition: all 0.3s;" onmouseover="this.style.background='white';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.background='var(--bg)';this.style.boxShadow='none'">
-            <div style="margin-bottom: 1rem; height: 60px; display: flex; align-items: center; justify-content: center;">
-              <div style="display: flex; gap: 0.5rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                  <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
-                </div>
-                <div style="width: 40px; height: 40px; background: white; border: 2px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                  <svg width="20" height="20" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Trusted by Publishers</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Trusted by industry leaders for privacy-first monetization with secure solutions.</p>
+        </div>
+        
+        <!-- Card 3 - Speed/Performance -->
+        <div class="soft-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);">
+          <div class="illustration-3d">
+            <div style="position: relative; width: 140px; height: 80px;">
+              <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2)); border-radius: 40px; transform: rotate(-5deg);"></div>
+              <div style="position: absolute; inset: 8px; background: white; border-radius: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);">
+                <div style="text-align: center;">
+                  <div style="font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">500</div>
+                  <div style="font-size: 0.6rem; color: var(--text-muted); font-weight: 600;">ms</div>
                 </div>
               </div>
-            </div>
-            <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">Scenario Comparison</h4>
-            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">Compare different franchise paths side by side to find the best option</p>
-          </div>
-          
-          <!-- Card 4 -->
-          <div style="background: var(--bg); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border); transition: all 0.3s;" onmouseover="this.style.background='white';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.background='var(--bg)';this.style.boxShadow='none'">
-            <div style="margin-bottom: 1rem; height: 60px; display: flex; align-items: center; justify-content: center;">
-              <div style="position: relative;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
-                  <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div style="position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: #10b981; border-radius: 50%; border: 2px solid white;"></div>
+              <div class="floating-element satellite-icon animate-float" style="top: -10px; right: -10px; width: 36px; height: 36px;">
+                <svg width="18" height="18" fill="none" stroke="#f59e0b" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               </div>
             </div>
-            <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">AI Consultant</h4>
-            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">Get AI-powered insights and recommendations tailored to your situation</p>
           </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Lightning Fast Setup</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Launch in days with clear documentation and support for every integration style.</p>
+        </div>
+      </div>
+      
+      <!-- Bottom Row - 2 Cards -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Card 4 - Integration Steps -->
+        <div class="soft-card-purple">
+          <div class="illustration-3d">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div class="main-3d-icon animate-float" style="width: 56px; height: 56px; border-radius: 16px;">
+                <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="floating-element" style="position: relative; width: auto; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; animation: float 3s ease-in-out infinite;">
+                  <div style="width: 24px; height: 24px; background: #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <span style="font-size: 0.8rem; font-weight: 600;">Approve offers</span>
+                </div>
+                <div class="floating-element" style="position: relative; width: auto; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; animation: float 3s ease-in-out infinite; animation-delay: 0.3s;">
+                  <div style="width: 24px; height: 24px; background: #3b82f6; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  </div>
+                  <span style="font-size: 0.8rem; font-weight: 600;">Go live</span>
+                </div>
+                <div class="floating-element" style="position: relative; width: auto; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; animation: float 3s ease-in-out infinite; animation-delay: 0.6s;">
+                  <div style="width: 24px; height: 24px; background: #f59e0b; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                  </div>
+                  <span style="font-size: 0.8rem; font-weight: 600;">Optimize</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Integration Steps</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Simple 3-step process to get your franchise simulation up and running quickly.</p>
+        </div>
+        
+        <!-- Card 5 - Results/Reports -->
+        <div class="soft-card-green">
+          <div class="illustration-3d">
+            <div style="position: relative;">
+              <div style="width: 120px; height: 100px; background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(34, 197, 94, 0.15); display: flex; flex-direction: column; padding: 1rem; gap: 0.5rem;">
+                <div style="height: 8px; background: linear-gradient(90deg, #22c55e, #4ade80); border-radius: 4px; width: 80%;"></div>
+                <div style="height: 8px; background: #dcfce7; border-radius: 4px; width: 100%;"></div>
+                <div style="height: 8px; background: #dcfce7; border-radius: 4px; width: 70%;"></div>
+                <div style="height: 8px; background: #dcfce7; border-radius: 4px; width: 90%;"></div>
+              </div>
+              <div class="floating-element satellite-icon animate-float" style="top: -15px; right: -20px; width: 44px; height: 44px; background: linear-gradient(135deg, #22c55e, #16a34a);">
+                <svg width="22" height="22" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Transparent Results</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Clear, detailed reports with actionable insights for your franchise decisions.</p>
         </div>
       </div>
     </div>
