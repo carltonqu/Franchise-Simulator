@@ -6,7 +6,7 @@
   <title>Welcome to Franchise AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -24,11 +24,11 @@
       background: #ffffff;
     }
 
-    /* Split Layout - Exactly 50/50 */
+    /* Split Layout */
     .split-container {
       display: flex;
       width: 100%;
-      height: 100vh;
+      min-height: 100vh;
     }
 
     /* Left Side */
@@ -37,51 +37,30 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 4rem 6rem;
+      align-items: center;
+      padding: 4rem 5rem;
       max-width: 50%;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 3rem;
-    }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-icon svg {
-      width: 20px;
-      height: 20px;
-      color: white;
+    .left-content {
+      width: 100%;
+      max-width: 480px;
     }
 
     h1 {
-      font-size: 3rem;
-      font-weight: 800;
+      font-size: 2.75rem;
+      font-weight: 700;
       color: #111827;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
       letter-spacing: -0.02em;
     }
 
     .subtitle {
-      font-size: 1.125rem;
-      color: #6b7280;
+      font-size: 1.0625rem;
+      color: #4b5563;
       line-height: 1.6;
       margin-bottom: 2.5rem;
-      max-width: 420px;
     }
 
     /* Feature Cards */
@@ -90,12 +69,11 @@
       flex-direction: column;
       gap: 1rem;
       margin-bottom: 2.5rem;
-      max-width: 480px;
     }
 
     .feature-card {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 1rem;
       padding: 1.25rem 1.5rem;
       border-radius: 16px;
@@ -105,15 +83,14 @@
     }
 
     .feature-card.active {
-      background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+      background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
       border-color: transparent;
-      color: white;
-      box-shadow: 0 10px 40px rgba(124, 58, 237, 0.3);
+      box-shadow: 0 8px 30px rgba(67, 56, 202, 0.25);
     }
 
     .feature-icon {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -122,11 +99,11 @@
     }
 
     .feature-card:not(.active) .feature-icon {
-      background: #f3e8ff;
+      background: #c4b5fd;
     }
 
     .feature-card.active .feature-icon {
-      background: rgba(255, 255, 255, 0.15);
+      background: white;
     }
 
     .feature-icon svg {
@@ -139,7 +116,7 @@
     }
 
     .feature-card.active .feature-icon svg {
-      color: white;
+      color: #4f46e5;
     }
 
     .feature-content {
@@ -150,6 +127,11 @@
       font-size: 0.9375rem;
       font-weight: 600;
       margin-bottom: 0.375rem;
+      color: #111827;
+    }
+
+    .feature-card.active .feature-content h3 {
+      color: white;
     }
 
     .feature-content p {
@@ -159,7 +141,7 @@
     }
 
     .feature-card.active .feature-content p {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .feature-check {
@@ -170,21 +152,18 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      margin-top: 0.25rem;
+      background: white;
     }
 
     .feature-card:not(.active) .feature-check {
       border: 2px solid #e5e7eb;
-    }
-
-    .feature-card.active .feature-check {
-      background: rgba(255, 255, 255, 0.2);
+      background: transparent;
     }
 
     .feature-check svg {
       width: 12px;
       height: 12px;
-      color: white;
+      color: #4f46e5;
       opacity: 0;
     }
 
@@ -194,48 +173,39 @@
 
     /* Start Link */
     .start-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
+      display: block;
+      text-align: center;
       color: #3b82f6;
       font-weight: 600;
       font-size: 1rem;
       text-decoration: none;
-      margin-bottom: 3rem;
-      transition: all 0.2s;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
     }
 
     .start-link:hover {
       color: #2563eb;
-      gap: 0.75rem;
-    }
-
-    .start-link svg {
-      transition: transform 0.2s;
-    }
-
-    .start-link:hover svg {
-      transform: translateX(4px);
     }
 
     /* Pagination */
     .pagination {
       display: flex;
-      gap: 0.5rem;
+      justify-content: center;
+      gap: 0.75rem;
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: #e5e7eb;
+      border: 2px solid #d1d5db;
+      background: transparent;
       transition: all 0.3s;
     }
 
     .dot.active {
-      background: #4c1d95;
-      width: 24px;
-      border-radius: 4px;
+      background: #312e81;
+      border-color: #312e81;
     }
 
     /* Right Side */
@@ -246,42 +216,31 @@
       justify-content: center;
       padding: 2rem;
       max-width: 50%;
-      background: #fafafa;
-    }
-
-    .phone-mockup {
-      width: 100%;
-      max-width: 380px;
-      height: 720px;
-      background: linear-gradient(180deg, #e0e7ff 0%, #c7d2fe 25%, #818cf8 60%, #6366f1 100%);
-      border-radius: 48px;
-      padding: 3rem 2.5rem;
+      background: linear-gradient(180deg, #e0e7ff 0%, #dbeafe 30%, #818cf8 70%, #6366f1 100%);
       position: relative;
       overflow: hidden;
-      box-shadow: 
-        0 25px 80px rgba(99, 102, 241, 0.25),
-        0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
-    .phone-mockup::before {
+    .right-side::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 60%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
-      pointer-events: none;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
     }
 
-    .phone-content {
+    .phone-mockup {
+      width: 100%;
+      max-width: 340px;
       position: relative;
       z-index: 1;
     }
 
     .phone-content h2 {
-      font-size: 2rem;
-      font-weight: 800;
+      font-size: 2.25rem;
+      font-weight: 700;
       color: #111827;
       line-height: 1.15;
       margin-bottom: 1rem;
@@ -289,17 +248,17 @@
     }
 
     .phone-content p {
-      font-size: 0.9375rem;
-      color: #4b5563;
+      font-size: 1rem;
+      color: #374151;
       line-height: 1.5;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     .phone-card-wrapper {
       background: white;
       border-radius: 24px;
       padding: 1.25rem;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     }
 
     .phone-card {
@@ -307,15 +266,15 @@
       align-items: center;
       gap: 1rem;
       padding: 1rem 1.25rem;
-      background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
-      border-radius: 14px;
+      background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
+      border-radius: 16px;
       color: white;
     }
 
     .phone-card-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.15);
+      width: 44px;
+      height: 44px;
+      background: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -324,19 +283,20 @@
     }
 
     .phone-card-icon svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
+      color: #4f46e5;
     }
 
     .phone-card h4 {
-      font-size: 0.875rem;
+      font-size: 0.9375rem;
       font-weight: 600;
       margin-bottom: 0.25rem;
     }
 
     .phone-card p {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.85);
       margin: 0;
     }
 
@@ -344,20 +304,11 @@
     @media (max-width: 1024px) {
       .split-container {
         flex-direction: column;
-        height: auto;
       }
 
       .left-side, .right-side {
         max-width: 100%;
         padding: 3rem 2rem;
-      }
-
-      .right-side {
-        min-height: 600px;
-      }
-
-      .phone-mockup {
-        height: 550px;
       }
     }
   </style>
@@ -366,84 +317,72 @@
   <div class="split-container">
     <!-- Left Side -->
     <div class="left-side">
-      <div class="logo">
-        <div class="logo-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-        </div>
-        Franchise AI
-      </div>
+      <div class="left-content">
+        <h1>Don't risk your money blindly</h1>
+        <p class="subtitle">Starting a franchise is risky. What if you could see the outcome before you invest?</p>
 
-      <h1>Don't risk your money blindly</h1>
-      <p class="subtitle">Starting a franchise is risky. What if you could see the outcome before you invest?</p>
+        <div class="feature-cards">
+          <!-- Card 1 - Active (Dark Purple) -->
+          <div class="feature-card active">
+            <div class="feature-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Simulate real scenarios</h3>
+              <p>Run detailed financial projections based on your franchise model, location, and investment.</p>
+            </div>
+            <div class="feature-check">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+          </div>
 
-      <div class="feature-cards">
-        <!-- Card 1 - Active -->
-        <div class="feature-card active">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
+          <!-- Card 2 -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Predict profit & risk</h3>
+              <p>Get accurate forecasts and risk assessments powered by AI trained on franchise data.</p>
+            </div>
+            <div class="feature-check">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
           </div>
-          <div class="feature-content">
-            <h3>Simulate real scenarios</h3>
-            <p>Run detailed financial projections based on your specific franchise model, location, and investment size.</p>
-          </div>
-          <div class="feature-check">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-          </div>
-        </div>
 
-        <!-- Card 2 -->
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div class="feature-content">
-            <h3>Predict profit & risk</h3>
-            <p>Get accurate revenue forecasts and risk assessments powered by AI trained on thousands of franchise data points.</p>
-          </div>
-          <div class="feature-check">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
-          </div>
-          <div class="feature-content">
-            <h3>Avoid costly mistakes</h3>
-            <p>Identify potential risks before they become expensive problems. Make data-driven decisions with confidence.</p>
-          </div>
-          <div class="feature-check">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
+          <!-- Card 3 -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Avoid costly mistakes</h3>
+              <p>Identify risks before they become expensive problems. Make confident decisions.</p>
+            </div>
+            <div class="feature-check">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      <a href="/" class="start-link">
-        Start Simulation
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-        </svg>
-      </a>
+        <a href="/" class="start-link">Start Simulation</a>
 
-      <div class="pagination">
-        <div class="dot active"></div>
-        <div class="dot"></div>
+        <div class="pagination">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+        </div>
       </div>
     </div>
 
