@@ -1,10 +1,24 @@
 {
-  "framework": "vite",
-  "buildCommand": "cd frontend && npm ci && npm run build",
-  "outputDirectory": "frontend/dist",
-  "rewrites": [
-    { "source": "/landing", "destination": "/landing.html" },
-    { "source": "/landing.html", "destination": "/landing.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    { "src": "api/index.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/health", "dest": "/api/index.js" },
+    { "src": "/health/(.*)", "dest": "/api/index.js" },
+    { "src": "/assets/(.*)", "dest": "/public/assets/$1" },
+    { "src": "/vite.svg", "dest": "/public/vite.svg" },
+    { "src": "/app", "dest": "/public/app.html" },
+    { "src": "/app/(.*)", "dest": "/public/app.html" },
+    { "src": "/results", "dest": "/public/app.html" },
+    { "src": "/results/(.*)", "dest": "/public/app.html" },
+    { "src": "/history", "dest": "/public/app.html" },
+    { "src": "/landing.html", "dest": "/public/landing.html" },
+    { "src": "/onboarding.html", "dest": "/public/onboarding.html" },
+    { "src": "/onboarding-2.html", "dest": "/public/onboarding-2.html" },
+    { "src": "/verify-email", "dest": "/public/verify-email.html" },
+    { "src": "/", "dest": "/public/landing.html" }
   ]
 }
