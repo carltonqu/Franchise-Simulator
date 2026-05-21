@@ -1,20 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import Stripe from 'stripe'
 import { randomUUID } from 'crypto'
+import { initDb, createUser, getUserByEmail, getUserById, updateUser, createSimulation, getSimulationsByUser, sanitizeUser } from './db.js'
 
 dotenv.config()
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const DATA_DIR = path.join(__dirname, '../data')
-const DB_PATH = path.join(DATA_DIR, 'db.json')
 
 const app = express()
 const PORT = process.env.PORT || 8787
@@ -23,36 +16,20 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5174'
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null
 
-function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
-  if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(
-      DB_PATH,
-      JSON.stringify({ users: [], subscriptions: [], simulations: [] }, null, 2),
-      'utf8'
-    )
+// Initialize database (lazy init on first request)
+let dbInitialized = false
+async function ensureDb() {
+  if (!dbInitialized) {
+    await initDb()
+    dbInitialized = true
   }
-}
-
-function readDb() {
-  ensureDb()
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'))
-}
-
-function writeDb(next) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(next, null, 2), 'utf8')
-}
-
-function sanitizeUser(user) {
-  const { passwordHash, ...safe } = user
-  return safe
 }
 
 function createToken(user) {
   return jwt.sign({ sub: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: '7d' })
 }
 
-function authOptional(req, _res, next) {
+async function authOptional(req, _res, next) {
   const authHeader = req.headers.authorization || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
   if (!token) {
@@ -61,16 +38,15 @@ function authOptional(req, _res, next) {
   }
   try {
     const payload = jwt.verify(token, JWT_SECRET)
-    const db = readDb()
-    req.user = db.users.find((u) => u.id === payload.sub) || null
+    req.user = await getUserById(payload.sub)
   } catch {
     req.user = null
   }
   next()
 }
 
-function requireAuth(req, res, next) {
-  authOptional(req, res, () => {
+async function requireAuth(req, res, next) {
+  await authOptional(req, res, () => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' })
     next()
   })
@@ -79,7 +55,7 @@ function requireAuth(req, res, next) {
 function requirePlan(plan) {
   return (req, res, next) => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' })
-    if (req.user.plan !== plan || req.user.planStatus !== 'active') {
+    if (req.user.plan !== plan || req.user.plan_status !== 'active') {
       return res.status(402).json({ error: `Upgrade required: ${plan}` })
     }
     next()
@@ -87,7 +63,7 @@ function requirePlan(plan) {
 }
 
 // Stripe webhook needs raw body
-app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(400).json({ error: 'Stripe not configured' })
 
   const sig = req.headers['stripe-signature']
@@ -98,34 +74,30 @@ app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), (req
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
-  const db = readDb()
-
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
     const userId = session.metadata?.userId
     if (userId) {
-      const idx = db.users.findIndex((u) => u.id === userId)
-      if (idx >= 0) {
-        db.users[idx].plan = 'pro'
-        db.users[idx].planStatus = 'active'
-        db.users[idx].stripeCustomerId = session.customer
-        db.users[idx].updatedAt = new Date().toISOString()
-      }
+      await updateUser(userId, {
+        plan: 'pro',
+        plan_status: 'active',
+        stripe_customer_id: session.customer
+      })
     }
   }
 
   if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
     const sub = event.data.object
-    const userIdx = db.users.findIndex((u) => u.stripeCustomerId === sub.customer)
-    if (userIdx >= 0) {
+    const user = await getUserById(sub.customer)
+    if (user) {
       const active = ['active', 'trialing'].includes(sub.status)
-      db.users[userIdx].plan = active ? 'pro' : 'free'
-      db.users[userIdx].planStatus = active ? 'active' : 'inactive'
-      db.users[userIdx].updatedAt = new Date().toISOString()
+      await updateUser(user.id, {
+        plan: active ? 'pro' : 'free',
+        plan_status: active ? 'active' : 'inactive'
+      })
     }
   }
 
-  writeDb(db)
   res.json({ received: true })
 })
 
@@ -157,19 +129,21 @@ const extractJson = (raw) => {
   }
 }
 
-app.get('/health', (_req, res) => {
+app.get('/health', async (_req, res) => {
+  await ensureDb()
   res.json({ ok: true })
 })
 
 app.post('/api/auth/register', async (req, res) => {
+  await ensureDb()
   try {
     const { email, password } = req.body || {}
     if (!email || !password || password.length < 6) {
       return res.status(400).json({ error: 'Email and password (min 6 chars) are required' })
     }
 
-    const db = readDb()
-    if (db.users.some((u) => u.email.toLowerCase() === String(email).toLowerCase())) {
+    const existingUser = await getUserByEmail(email)
+    if (existingUser) {
       return res.status(409).json({ error: 'Email already exists' })
     }
 
@@ -185,34 +159,36 @@ app.post('/api/auth/register', async (req, res) => {
       updatedAt: now,
     }
 
-    db.users.push(user)
-    writeDb(db)
+    await createUser(user)
 
     const token = createToken(user)
     res.status(201).json({ token, user: sanitizeUser(user) })
   } catch (error) {
+    console.error('Register error:', error)
     res.status(500).json({ error: error.message || 'Failed to register' })
   }
 })
 
 app.post('/api/auth/login', async (req, res) => {
+  await ensureDb()
   try {
     const { email, password } = req.body || {}
-    const db = readDb()
-    const user = db.users.find((u) => u.email === String(email).toLowerCase())
+    const user = await getUserByEmail(email)
     if (!user) return res.status(401).json({ error: 'Invalid credentials' })
 
-    const ok = await bcrypt.compare(password || '', user.passwordHash)
+    const ok = await bcrypt.compare(password || '', user.password_hash)
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' })
 
     const token = createToken(user)
     res.json({ token, user: sanitizeUser(user) })
   } catch (error) {
+    console.error('Login error:', error)
     res.status(500).json({ error: error.message || 'Failed to login' })
   }
 })
 
-app.get('/api/me', requireAuth, (req, res) => {
+app.get('/api/me', requireAuth, async (req, res) => {
+  await ensureDb()
   res.json({ user: sanitizeUser(req.user) })
 })
 
@@ -237,32 +213,42 @@ app.post('/api/billing/create-checkout-session', requireAuth, async (req, res) =
   }
 })
 
-app.post('/api/simulations', requireAuth, (req, res) => {
-  const db = readDb()
-  const now = new Date().toISOString()
-  const simulation = {
-    id: randomUUID(),
-    userId: req.user.id,
-    inputJson: req.body?.inputJson || {},
-    resultJson: req.body?.resultJson || {},
-    aiReportJson: req.body?.aiReportJson || {},
-    isShallow: req.user.plan !== 'pro',
-    createdAt: now,
-    updatedAt: now,
+app.post('/api/simulations', requireAuth, async (req, res) => {
+  await ensureDb()
+  try {
+    const now = new Date().toISOString()
+    const simulation = {
+      id: randomUUID(),
+      userId: req.user.id,
+      inputJson: req.body?.inputJson || {},
+      resultJson: req.body?.resultJson || {},
+      aiReportJson: req.body?.aiReportJson || {},
+      isShallow: req.user.plan !== 'pro',
+      createdAt: now,
+      updatedAt: now,
+    }
+    await createSimulation(simulation)
+    res.status(201).json({ simulation })
+  } catch (error) {
+    console.error('Create simulation error:', error)
+    res.status(500).json({ error: error.message || 'Failed to save simulation' })
   }
-  db.simulations.unshift(simulation)
-  writeDb(db)
-  res.status(201).json({ simulation })
 })
 
-app.get('/api/simulations', requireAuth, (req, res) => {
-  const db = readDb()
-  const list = db.simulations.filter((s) => s.userId === req.user.id)
-  const limit = req.user.plan === 'pro' ? 100 : 3
-  res.json({ simulations: list.slice(0, limit) })
+app.get('/api/simulations', requireAuth, async (req, res) => {
+  await ensureDb()
+  try {
+    const limit = req.user.plan === 'pro' ? 100 : 3
+    const simulations = await getSimulationsByUser(req.user.id, limit)
+    res.json({ simulations })
+  } catch (error) {
+    console.error('Get simulations error:', error)
+    res.status(500).json({ error: error.message || 'Failed to get simulations' })
+  }
 })
 
 app.post('/api/report', authOptional, async (req, res) => {
+  await ensureDb()
   try {
     const { inputAssumptions, results } = req.body || {}
     if (!inputAssumptions || !results) {
@@ -276,7 +262,7 @@ app.post('/api/report', authOptional, async (req, res) => {
       })
     }
 
-    const isPro = req.user?.plan === 'pro' && req.user?.planStatus === 'active'
+    const isPro = req.user?.plan === 'pro' && req.user?.plan_status === 'active'
 
     const prompt = `You are a financial simulation report assistant.
 Return plain JSON only with this schema:
@@ -347,4 +333,5 @@ ${JSON.stringify(results, null, 2)}
 
 app.listen(PORT, () => {
   console.log(`Backend API running on http://localhost:${PORT}`)
+  console.log(`Using Turso database: ${process.env.DATABASE_URL?.includes('libsql') ? 'Turso Cloud' : 'Local SQLite'}`)
 })
