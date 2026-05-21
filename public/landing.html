@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Franchise AI Consultant - Simulate Your Franchise Future</title>
+  <meta name="description" content="AI-powered franchise simulation tool. Test business scenarios, predict risks, and make smarter investment decisions before you commit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #8b5cf6;
+      --gradient-start: #8b5cf6;
+      --gradient-end: #3b82f6;
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+      --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(250, 250, 250, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .nav-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .logo-icon svg {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    .nav-center {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .nav-center a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-center a:hover {
+      color: var(--primary);
+    }
+
+    .nav-center a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      transition: width 0.3s;
+    }
+
+    .nav-center a:hover::after {
+      width: 100%;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.625rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      border: none;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .btn-dark {
+      background: var(--text);
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background: #374151;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section - New Design */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59, 130, 246, 0.08), transparent);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.03em;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+
+    .hero-cta .btn {
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+
+    /* Search Box */
+    .search-container {
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      transition: all 0.3s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-lg), 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-icon {
+      padding: 0 1rem;
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 0.875rem 0;
+      font-size: 1rem;
+      outline: none;
+      color: var(--text);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-btn {
+      padding: 0.75rem 1.5rem;
+    }
+
+    /* Hero Stats */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 3rem;
+      animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Floating Cards - New Design */
+    .floating-cards {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 4rem;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    .float-card {
+      background: var(--bg-card);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      width: 280px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .float-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+    }
+
+    .float-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .float-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .float-card-icon.purple {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .float-card-icon.green {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .float-card-icon.blue {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .float-card-icon svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+
+    .float-card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .float-card-body {
+      padding: 1.25rem;
+    }
+
+    .mini-chart {
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .mini-bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 4px 4px 0 0;
+      transition: all 0.3s;
+    }
+
+    .mini-bar:hover {
+      opacity: 0.8;
+    }
+
+    .mini-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .mini-metric {
+      background: var(--bg);
+      padding: 0.75rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .mini-metric-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mini-metric-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Styles */
+    .section {
+      padding: 6rem 2rem;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+    }
+
+    /* Bento Grid - Consistent Cards */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .bento-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+
+    .bento-card-large {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .bento-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .bento-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+
+    .bento-card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .bento-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    /* Feature Section */
+    .features-section {
+      background: white;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border-radius: var(--card-radius);
+      padding: 2rem;
+      border: 1px solid var(--border);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+
+    .feature-card h4 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Metrics Section */
+    .metrics-section {
+      background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border-radius: var(--card-radius);
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .metric-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+    }
+
+    .metric-icon svg {
+      width: 32px;
+      height: 32px;
+      color: white;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .metric-label {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-sublabel {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Testimonials Section */
+    .testimonials-section {
+      background: white;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .testimonial-card {
+      background: var(--bg);
+      border-radius: var(--card-radius);
+      padding: 2rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .testimonial-card:hover {
+      background: var(--bg-card);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .testimonial-stars {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-stars svg {
+      width: 18px;
+      height: 18px;
+      fill: #fbbf24;
+    }
+
+    .testimonial-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .testimonial-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .testimonial-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .testimonial-role {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Pricing Section */
+    .pricing-section {
+      background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border-radius: var(--card-radius);
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pricing-card.featured {
+      border: 2px solid var(--primary);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      position: relative;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      padding: 0.375rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pricing-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-price {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-price span {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 2rem;
+      flex: 1;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.875rem;
+      font-size: 0.9rem;
+    }
+
+    .pricing-features svg {
+      width: 18px;
+      height: 18px;
+      color: #10b981;
+      flex-shrink: 0;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      background: white;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .faq-card {
+      background: var(--bg);
+      border-radius: var(--card-radius);
+      padding: 2rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .faq-card:hover {
+      background: var(--bg-card);
+      box-shadow: var(--shadow);
+    }
+
+    .faq-question {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .faq-answer {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-box h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .cta-box p {
+      font-size: 1.125rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 2rem;
+    }
+
+    .cta-box .btn {
+      background: white;
+      color: var(--primary);
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+    }
+
+    .cta-box .btn:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 2rem;
+      background: var(--bg);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .footer-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Card Border Radius Standard */
+    :root {
+      --card-radius: 24px;
+      --icon-radius: 16px;
+      --badge-radius: 20px;
+    }
+
+    /* Soft Gradient Card Styles - Purple/Blue/Pink */
+    .soft-card {
+      background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #ede9fe 100%);
+      border-radius: var(--card-radius);
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.04),
+        0 10px 40px -10px rgba(139, 92, 246, 0.12),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .soft-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.5), transparent);
+      pointer-events: none;
+    }
+
+    .soft-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 20px 60px -10px rgba(139, 92, 246, 0.2),
+        0 10px 40px -10px rgba(59, 130, 246, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .soft-card-alt {
+      background: linear-gradient(135deg, #fdf4ff 0%, #f5f3ff 50%, #eff6ff 100%);
+      border-radius: var(--card-radius);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.04),
+        0 10px 40px -10px rgba(168, 85, 247, 0.12),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .soft-card-alt:hover {
+      box-shadow: 
+        0 20px 60px -10px rgba(168, 85, 247, 0.2),
+        0 10px 40px -10px rgba(99, 102, 241, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .soft-card-dark {
+      background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 50%, #dbeafe 100%);
+      border-radius: var(--card-radius);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.04),
+        0 10px 40px -10px rgba(124, 58, 237, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .soft-card-dark:hover {
+      box-shadow: 
+        0 20px 60px -10px rgba(124, 58, 237, 0.22),
+        0 10px 40px -10px rgba(79, 70, 229, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* 3D Illustration Styles */
+    .illustration-3d {
+      position: relative;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .floating-element {
+      position: absolute;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .floating-element:hover {
+      transform: scale(1.05) translateY(-2px);
+    }
+
+    .main-3d-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 20px 40px rgba(99, 102, 241, 0.3),
+        0 8px 16px rgba(99, 102, 241, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    .main-3d-icon svg {
+      width: 40px;
+      height: 40px;
+      color: white;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .satellite-icon {
+      width: 48px;
+      height: 48px;
+      z-index: 1;
+    }
+
+    .satellite-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .connection-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(59, 130, 246, 0.3));
+      border-radius: 1px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+      animation: float-delayed 4s ease-in-out infinite;
+      animation-delay: 1s;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero h1 {
+        font-size: 3rem;
+      }
+
+      .bento-grid,
+      .features-grid,
+      .metrics-grid,
+      .testimonials-grid,
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .bento-card-large {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+
+      .floating-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .float-card {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-center {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 6rem;
+      }
+
+      .hero h1 {
+        font-size: 2.25rem;
+      }
+
+      .hero-stats {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .bento-grid,
+      .features-grid,
+      .metrics-grid,
+      .testimonials-grid,
+      .pricing-grid,
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-card-large {
+        grid-column: span 1;
+      }
+
+      .section-header h2 {
+        font-size: 1.75rem;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        Franchise AI
+      </div>
+      <div class="nav-center">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="nav-right">
+        <a href="/onboarding.html" class="btn btn-outline">Log in</a>
+        <a href="/onboarding.html" class="btn btn-primary">Get a demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        AI-Powered Franchise Simulation
+      </div>
+      <h1>Make smarter franchise<br>decisions with <span>AI</span></h1>
+      <p class="hero-description">Simulate, compare, and analyze franchise opportunities before you invest. Get data-driven insights in minutes.</p>
+      <div class="hero-cta">
+        <a href="/onboarding.html" class="btn btn-dark">Start Free Simulation</a>
+        <a href="/onboarding.html" class="btn btn-outline">Watch Demo</a>
+      </div>
+      
+      <div class="search-container">
+        <div class="search-box">
+          <div class="search-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <input type="text" class="search-input" placeholder="What if my monthly rent increases by 20%?">
+          <a href="/onboarding.html" class="btn btn-dark search-btn">Try me</a>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">10K+</div>
+          <div class="hero-stat-label">Simulations Run</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">$50M+</div>
+          <div class="hero-stat-label">Investments Analyzed</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">98%</div>
+          <div class="hero-stat-label">Accuracy Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Cards -->
+    <div class="floating-cards">
+      <div class="float-card">
+        <div class="float-card-header">
+          <div class="float-card-icon purple">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <span class="float-card-title">Risk Assessment</span>
+        </div>
+        <div class="float-card-body">
+          <div class="mini-chart">
+            <div class="mini-bar" style="height: 40%;"></div>
+            <div class="mini-bar" style="height: 60%;"></div>
+            <div class="mini-bar" style="height: 80%;"></div>
+            <div class="mini-bar" style="height: 45%;"></div>
+            <div class="mini-bar" style="height: 90%;"></div>
+            <div class="mini-bar" style="height: 70%;"></div>
+            <div class="mini-bar" style="height: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-card">
+        <div class="float-card-header">
+          <div class="float-card-icon green">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="float-card-title">Financial Projections 2026</span>
+        </div>
+        <div class="float-card-body">
+          <div class="mini-metrics">
+            <div class="mini-metric">
+              <div class="mini-metric-value">$48K</div>
+              <div class="mini-metric-label">Revenue</div>
+            </div>
+            <div class="mini-metric">
+              <div class="mini-metric-value">18 mo</div>
+              <div class="mini-metric-label">Payback</div>
+            </div>
+            <div class="mini-metric">
+              <div class="mini-metric-value">85/100</div>
+              <div class="mini-metric-label">Risk Score</div>
+            </div>
+            <div class="mini-metric">
+              <div class="mini-metric-value">Month 7</div>
+              <div class="mini-metric-label">Break-even</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-card">
+        <div class="float-card-header">
+          <div class="float-card-icon blue">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <span class="float-card-title">Daily Activity</span>
+        </div>
+        <div class="float-card-body">
+          <div class="mini-chart">
+            <div class="mini-bar" style="height: 30%;"></div>
+            <div class="mini-bar" style="height: 50%;"></div>
+            <div class="mini-bar" style="height: 70%;"></div>
+            <div class="mini-bar" style="height: 40%;"></div>
+            <div class="mini-bar" style="height: 85%;"></div>
+            <div class="mini-bar" style="height: 60%;"></div>
+            <div class="mini-bar" style="height: 95%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section - Professional UI/UX Design -->
+  <section class="section features-section" id="features" style="background: #fafafa; padding: 5rem 2rem;">
+    <div class="container">
+      <div class="section-header" style="margin-bottom: 3.5rem; text-align: center;">
+        <h2 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem;">Everything you need to decide</h2>
+        <p style="font-size: 1.125rem; color: var(--text-muted);">Powerful tools to help you evaluate franchise opportunities with confidence</p>
+      </div>
+      
+      <!-- Top Row - 3 Cards -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 2rem;">
+        <!-- Card 1 - Steady Revenue -->
+        <div class="soft-card" style="padding: 2.5rem; display: flex; flex-direction: column; min-height: 380px;">
+          <div style="flex: 1; position: relative; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; min-height: 180px;">
+            <!-- Background glow -->
+            <div style="position: absolute; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1)); border-radius: 50%; filter: blur(20px);"></div>
+            <!-- Main icon -->
+            <div style="position: relative; width: 64px; height: 64px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--icon-radius); display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3); z-index: 2;">
+              <svg width="32" height="32" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <!-- Satellite icons -->
+            <div style="position: absolute; top: 15px; left: 25px; width: 36px; height: 36px; background: white; border-radius: var(--icon-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" fill="none" stroke="#8b5cf6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div style="position: absolute; bottom: 20px; right: 30px; width: 32px; height: 32px; background: white; border-radius: var(--icon-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" fill="none" stroke="#a855f7" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text);">Steady Revenue</h4>
+          <p style="font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Predictable payouts, transparent reporting, and continuous optimization for your franchise.</p>
+        </div>
+        
+        <!-- Card 2 - Risk Assessment -->
+        <div class="soft-card-alt" style="padding: 2.5rem; display: flex; flex-direction: column; min-height: 380px;">
+          <div style="flex: 1; position: relative; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; min-height: 180px;">
+            <!-- Background glow -->
+            <div style="position: absolute; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.1)); border-radius: 50%; filter: blur(20px);"></div>
+            <!-- Main icon -->
+            <div style="position: relative; width: 64px; height: 64px; background: linear-gradient(135deg, #8b5cf6, #a855f7); border-radius: var(--icon-radius); display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3); z-index: 2;">
+              <svg width="32" height="32" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <!-- Badge icons -->
+            <div style="position: absolute; top: 20px; right: 20px; padding: 0.375rem 0.75rem; background: white; border-radius: var(--badge-radius); box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 0.7rem; font-weight: 600; color: #7c3aed;">Secure</div>
+            <div style="position: absolute; bottom: 25px; left: 20px; padding: 0.375rem 0.75rem; background: white; border-radius: var(--badge-radius); box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 0.7rem; font-weight: 600; color: #8b5cf6;">Protected</div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text);">Risk Assessment</h4>
+          <p style="font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Advanced risk detection algorithms to protect your investment decisions.</p>
+        </div>
+        
+        <!-- Card 3 - Lightning Fast -->
+        <div class="soft-card-dark" style="padding: 2.5rem; display: flex; flex-direction: column; min-height: 380px;">
+          <div style="flex: 1; position: relative; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; min-height: 180px;">
+            <!-- Background glow -->
+            <div style="position: absolute; width: 120px; height: 80px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(168, 85, 247, 0.08)); border-radius: 40px; transform: rotate(-3deg);"></div>
+            <!-- Speedometer -->
+            <div style="position: relative; width: 110px; height: 60px; background: white; border-radius: var(--badge-radius); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15); display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">2min</div>
+                <div style="font-size: 0.625rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">setup</div>
+              </div>
+            </div>
+            <!-- Lightning icon -->
+            <div style="position: absolute; top: 10px; right: 25px; width: 32px; height: 32px; background: white; border-radius: var(--icon-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" fill="none" stroke="#8b5cf6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text);">Lightning Fast Setup</h4>
+          <p style="font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Launch in minutes with clear documentation and support for every integration style.</p>
+        </div>
+      </div>
+      
+      <!-- Bottom Row - 2 Cards -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Card 4 - Integration Steps -->
+        <div class="soft-card" style="padding: 2.5rem; display: flex; flex-direction: column; min-height: 380px;">
+          <div style="flex: 1; position: relative; margin-bottom: 2rem; display: flex; align-items: center; justify-content: flex-start; padding-left: 2rem; min-height: 200px;">
+            <!-- Main icon -->
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--icon-radius); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); margin-right: 1.5rem; flex-shrink: 0;">
+              <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+            </div>
+            <!-- Steps -->
+            <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+              <div style="display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.875rem; background: white; border-radius: var(--icon-radius); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <div style="width: 22px; height: 22px; background: linear-gradient(135deg, #8b5cf6, #a855f7); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="12" height="12" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text);">Input data</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.875rem; background: white; border-radius: var(--icon-radius); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <div style="width: 22px; height: 22px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="12" height="12" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text);">Run AI</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.875rem; background: white; border-radius: var(--icon-radius); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <div style="width: 22px; height: 22px; background: linear-gradient(135deg, #a855f7, #c084fc); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="12" height="12" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text);">Get insights</span>
+              </div>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text);">Integration Steps</h4>
+          <p style="font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Simple 3-step process to get your franchise simulation up and running quickly.</p>
+        </div>
+        
+        <!-- Card 5 - Transparent Results -->
+        <div class="soft-card-alt" style="padding: 2.5rem; display: flex; flex-direction: column; min-height: 380px;">
+          <div style="flex: 1; position: relative; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; min-height: 200px;">
+            <!-- Background glow -->
+            <div style="position: absolute; width: 140px; height: 100px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.08)); border-radius: 20px; filter: blur(15px);"></div>
+            <!-- Document -->
+            <div style="position: relative; width: 130px; height: 100px; background: white; border-radius: var(--icon-radius); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.12); display: flex; flex-direction: column; padding: 1.25rem; gap: 0.625rem; z-index: 2;">
+              <div style="height: 6px; background: linear-gradient(90deg, #8b5cf6, #a855f7); border-radius: 3px; width: 70%;"></div>
+              <div style="height: 6px; background: #f3e8ff; border-radius: 3px; width: 100%;"></div>
+              <div style="height: 6px; background: #f3e8ff; border-radius: 3px; width: 85%;"></div>
+              <div style="height: 6px; background: #f3e8ff; border-radius: 3px; width: 60%;"></div>
+              <div style="height: 6px; background: #f3e8ff; border-radius: 3px; width: 90%;"></div>
+            </div>
+            <!-- Checkmark badge -->
+            <div style="position: absolute; top: 15px; right: 35px; width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #a855f7); border-radius: var(--icon-radius); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); z-index: 3;">
+              <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </div>
+          <h4 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text);">Transparent Results</h4>
+          <p style="font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Clear, detailed reports with actionable insights for your franchise decisions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics Section - New Bento Layout -->
+  <section class="section metrics-section" style="background: linear-gradient(135deg, #f8f7ff 0%, #f0f4ff 100%); padding: 6rem 2rem;">
+    <div class="container">
+      <!-- Top Large Card -->
+      <div style="background: white; border-radius: var(--card-radius); padding: 3rem; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; min-height: 400px;">
+        <div>
+          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; line-height: 1.3;">Real-time Financial Dashboard</h3>
+          <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem;">Track your revenue, expenses, and profitability with live updates. Our dashboard gives you a complete picture of your franchise performance at a glance.</p>
+          <div style="display: flex; gap: 2rem;">
+            <div>
+              <div style="font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">$48.5K</div>
+              <div style="font-size: 0.875rem; color: var(--text-muted);">Monthly Revenue</div>
+            </div>
+            <div>
+              <div style="font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">+12%</div>
+              <div style="font-size: 0.875rem; color: var(--text-muted);">vs Projection</div>
+            </div>
+          </div>
+        </div>
+        <div style="position: relative; height: 320px; display: flex; align-items: center; justify-content: center;">
+          <!-- Central Dashboard Mockup -->
+          <div style="width: 200px; height: 240px; background: linear-gradient(135deg, #f5f3ff, #eff6ff); border-radius: 20px; border: 2px solid rgba(139, 92, 246, 0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 2; box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);">
+            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);">
+              <svg width="32" height="32" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div style="font-weight: 600; color: var(--text);">Franchise AI</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Dashboard</div>
+          </div>
+          <!-- Orbiting Icons -->
+          <div style="position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; background: white; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="20" height="20" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div style="position: absolute; top: 40px; right: 30px; width: 44px; height: 44px; background: white; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="20" height="20" fill="none" stroke="#f59e0b" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div style="position: absolute; bottom: 50px; left: 10px; width: 44px; height: 44px; background: white; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="20" height="20" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div style="position: absolute; bottom: 30px; right: 20px; width: 44px; height: 44px; background: white; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="20" height="20" fill="none" stroke="#ef4444" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div style="position: absolute; top: 50%; left: 0; width: 40px; height: 40px; background: white; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="18" height="18" fill="none" stroke="#8b5cf6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div style="position: absolute; top: 10%; right: 5px; width: 36px; height: 36px; background: white; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <svg width="16" height="16" fill="none" stroke="#ec4899" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bottom Row Cards -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Card 1 - Risk Score -->
+        <div style="background: white; border-radius: var(--card-radius); padding: 2.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; gap: 2rem; align-items: flex-start; min-height: 280px;">
+          <div style="flex-shrink: 0;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #dbeafe, #ede9fe); border-radius: 20px; display: flex; align-items: center; justify-content: center; position: relative;">
+              <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);">
+                <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <!-- Small floating icons -->
+              <div style="position: absolute; top: -8px; right: -8px; width: 28px; height: 28px; background: white; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                <svg width="14" height="14" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <div style="position: absolute; bottom: -6px; left: -6px; width: 24px; height: 24px; background: white; border-radius: 6px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                <svg width="12" height="12" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Risk Score Analysis</h4>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">Get an instant risk assessment based on location, market conditions, and financial projections.</p>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">82/100</div>
+              <div style="padding: 0.375rem 0.875rem; background: #dcfce7; color: #166534; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Low-Medium Risk</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card 2 - AI Chat Interface -->
+        <div style="background: white; border-radius: var(--card-radius); padding: 2.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); min-height: 280px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Ask about your payback period and break-even analysis</p>
+          <div style="background: var(--bg); border-radius: 12px; padding: 0.875rem; margin-bottom: 1rem; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.875rem; color: var(--text); line-height: 1.5;">Based on your inputs, your payback period is <strong>14 months</strong> with break-even at month 6. This is considered excellent for the industry.</div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+            <div style="flex: 1; background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 0.625rem 1rem; font-size: 0.875rem; color: var(--text-muted);">Ask me anything...</div>
+            <div style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </div>
+          </div>
+          <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">AI-Powered Insights</h4>
+          <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">Chat with our AI to get personalized recommendations and answers to your questions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Trusted by franchise owners</h2>
+        <p>See what our users say about their experience</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="testimonial-text">"This tool saved me from a bad investment. The risk analysis showed red flags I would've missed."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JM</div>
+            <div>
+              <div class="testimonial-name">James Mitchell</div>
+              <div class="testimonial-role">Franchise Owner, Sydney</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="testimonial-text">"The scenario comparison feature helped me choose between two locations. Highly recommend!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SC</div>
+            <div>
+              <div class="testimonial-name">Sarah Chen</div>
+              <div class="testimonial-role">Investor, Melbourne</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="testimonial-text">"Finally, a tool that gives me confidence in my franchise decisions. The AI insights are spot on."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MR</div>
+            <div>
+              <div class="testimonial-name">Michael Rodriguez</div>
+              <div class="testimonial-role">Franchise Consultant</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="section pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simple, transparent pricing</h2>
+        <p>Choose the plan that fits your needs</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Starter</div>
+          <div class="pricing-desc">Perfect for first-time franchisees</div>
+          <div class="pricing-price">$0</div>
+          <ul class="pricing-features">
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              3 simulations per month
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Basic risk analysis
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Email support
+            </li>
+          </ul>
+          <a href="/onboarding.html" class="btn btn-outline" style="width: 100%;">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-badge">MOST POPULAR</div>
+          <div class="pricing-name">Professional</div>
+          <div class="pricing-desc">For serious franchise investors</div>
+          <div class="pricing-price">$49<span>/mo</span></div>
+          <ul class="pricing-features">
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Unlimited simulations
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Advanced AI insights
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Scenario comparison
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Priority support
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              PDF exports
+            </li>
+          </ul>
+          <a href="/onboarding.html" class="btn btn-primary" style="width: 100%;">Get Started</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Enterprise</div>
+          <div class="pricing-desc">For franchise brands & consultants</div>
+          <div class="pricing-price">Custom</div>
+          <ul class="pricing-features">
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Everything in Pro
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              White-label option
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Dedicated manager
+            </li>
+            <li>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Custom integrations
+            </li>
+          </ul>
+          <a href="/onboarding.html" class="btn btn-outline" style="width: 100%;">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently asked questions</h2>
+        <p>Everything you need to know</p>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-card">
+          <div class="faq-question">How accurate are the simulations?</div>
+          <div class="faq-answer">Our AI models are trained on thousands of real franchise data points. While no prediction is 100% accurate, our simulations provide reliable estimates based on your specific inputs.</div>
+        </div>
+        <div class="faq-card">
+          <div class="faq-question">Can I compare multiple opportunities?</div>
+          <div class="faq-answer">Yes! Our Professional and Enterprise plans allow you to save and compare unlimited scenarios side by side, making it easy to evaluate different options.</div>
+        </div>
+        <div class="faq-card">
+          <div class="faq-question">What data do I need to provide?</div>
+          <div class="faq-answer">Basic inputs include franchise type, initial investment, location, monthly rent, labor costs, and expected sales. The more details, the more accurate.</div>
+        </div>
+        <div class="faq-card">
+          <div class="faq-question">Is my data secure?</div>
+          <div class="faq-answer">Absolutely. We use bank-level encryption and never share your data with third parties. Your simulation data is stored securely.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Ready to simulate your franchise future?</h2>
+      <p>Join thousands of investors making smarter decisions with AI-powered simulations.</p>
+      <a href="/onboarding.html" class="btn">Start Free Simulation</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="logo-icon" style="width: 32px; height: 32px;">
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        Franchise AI Consultant
+      </div>
+      <div class="footer-copy">© 2026 Franchise AI Consultant. All rights reserved.</div>
+    </div>
+  </footer>
+</body>
+</html>
