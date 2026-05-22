@@ -6,14 +6,14 @@ export default function SimulateScenariosPage() {
   const { scenario, scenarioKey, setScenarioKey, scenarios } = useResults()
 
   return (
-    <section className="results-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div className="results-header" style={{ textAlign: 'center', width: '100%' }}>
+    <section className="results-section">
+      <div className="results-header">
         <h1>Simulate Real Scenarios</h1>
         <p>Revenue projections and cost structure analysis</p>
       </div>
 
       {/* Scenario Toggle */}
-      <div className="scenario-toggle" style={{ justifyContent: 'center' }}>
+      <div className="scenario-toggle">
         {(['best', 'base', 'worst'] as ScenarioKey[]).map((key) => (
           <button 
             key={key} 
@@ -26,7 +26,7 @@ export default function SimulateScenariosPage() {
       </div>
 
       {/* Results Grid */}
-      <div className="results-grid" style={{ justifyContent: 'center', width: '100%' }}>
+      <div className="results-grid">
         {/* Revenue Timeline Card */}
         <div className="result-card">
           <span className="result-label">Revenue Timeline</span>
@@ -59,7 +59,7 @@ export default function SimulateScenariosPage() {
       </div>
 
       {/* Key Assumptions */}
-      <div className="result-card full-width" style={{ textAlign: 'center' }}>
+      <div className="result-card full-width">
         <span className="result-label">Key Assumptions</span>
         <ul className="assumptions-list">
           {scenario.assumptions.map((assumption) => (

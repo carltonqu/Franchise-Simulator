@@ -10,14 +10,14 @@ export default function CompareScenariosPage() {
   ]
 
   return (
-    <section className="results-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div className="results-header" style={{ textAlign: 'center', width: '100%' }}>
+    <section className="results-section">
+      <div className="results-header">
         <h1>Compare Scenarios</h1>
         <p>Side-by-side comparison of all scenarios</p>
       </div>
 
       {/* Scenario Cards */}
-      <div className="results-grid three-col" style={{ justifyContent: 'center', width: '100%' }}>
+      <div className="results-grid three-col">
         {(['best', 'base', 'worst'] as ScenarioKey[]).map((key) => (
           <div key={key} className={`result-card ${key === 'best' ? 'winner' : ''}`}>
             <span className="result-label">{scenarioData[key].label}</span>
@@ -29,7 +29,7 @@ export default function CompareScenariosPage() {
       </div>
 
       {/* Comparison Table */}
-      <div className="result-card full-width" style={{ textAlign: 'center' }}>
+      <div className="result-card full-width">
         <span className="result-label">KPI Comparison</span>
         <div className="comparison-table-wrap">
           <table className="comparison-table">
