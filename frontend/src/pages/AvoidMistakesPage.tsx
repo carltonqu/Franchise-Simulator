@@ -3,14 +3,14 @@ import { mitigations, warningFlags } from '../results/resultsData'
 
 export default function AvoidMistakesPage() {
   return (
-    <section className="results-section">
-      <div className="results-header">
+    <section className="results-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className="results-header" style={{ textAlign: 'center', width: '100%' }}>
         <h1>Avoid Costly Mistakes</h1>
         <p>Warning flags and mitigation strategies</p>
       </div>
 
       {/* Warning Flags & Mitigation */}
-      <div className="results-grid">
+      <div className="results-grid" style={{ justifyContent: 'center', width: '100%' }}>
         <div className="result-card warning">
           <span className="result-label">⚠️ Warning Flags</span>
           <ul className="warning-list">
@@ -30,7 +30,7 @@ export default function AvoidMistakesPage() {
       </div>
 
       {/* What Could Go Wrong */}
-      <div className="result-card full-width">
+      <div className="result-card full-width" style={{ textAlign: 'center' }}>
         <span className="result-label">What Could Go Wrong</span>
         <p className="scenario-text">
           Delayed ramp-up by 2 months, rent increase at month 6, and a 5% COGS spike 

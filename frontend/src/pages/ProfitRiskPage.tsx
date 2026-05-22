@@ -7,14 +7,14 @@ export default function ProfitRiskPage() {
   const breakEven = Math.max(1, scenario.paybackMonths - 4)
 
   return (
-    <section className="results-section">
-      <div className="results-header">
+    <section className="results-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className="results-header" style={{ textAlign: 'center', width: '100%' }}>
         <h1>Predict Profit & Risk</h1>
         <p>Profit forecast and risk assessment analysis</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="results-grid three-col">
+      <div className="results-grid three-col" style={{ justifyContent: 'center', width: '100%' }}>
         <div className="result-card">
           <span className="result-label">12-Month Profit</span>
           <span className="result-value">{formatMoney(scenario.yearlyProfit)}</span>
@@ -33,7 +33,7 @@ export default function ProfitRiskPage() {
       </div>
 
       {/* Risk Factors */}
-      <div className="result-card full-width">
+      <div className="result-card full-width" style={{ textAlign: 'center' }}>
         <span className="result-label">Top 3 Risk Factors</span>
         <ol className="risk-factors-list">
           {riskFactors.map((item, index) => (
