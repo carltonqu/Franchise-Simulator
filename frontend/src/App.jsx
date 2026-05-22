@@ -79,8 +79,7 @@ function SimulatorFormPage() {
             </div>
           ) : (
             <div className="auth-links">
-              <a href="/login" className="auth-link">Sign In</a>
-              <a href="/register" className="auth-link primary">Create Account</a>
+              <a href="/app" className="auth-link primary">Simulate Again</a>
             </div>
           )}
         </div>
