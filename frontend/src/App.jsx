@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
+import { AuthProvider, useAuth } from './auth/AuthContext'
 import ResultsLayout from './components/ResultsLayout'
 import FormSidebar from './components/FormSidebar'
 import FloatingHistoryButton from './components/FloatingHistoryButton'
@@ -12,6 +13,9 @@ import AvoidMistakesPage from './pages/AvoidMistakesPage'
 import CompareScenariosPage from './pages/CompareScenariosPage'
 import ExportReportsPage from './pages/ExportReportsPage'
 import HistoryPage from './pages/HistoryPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
 
 const initialFormData = {
   brandName: '',
@@ -28,9 +32,26 @@ const initialFormData = {
   rampUpMonths: '3',
 }
 
+// Protected Route wrapper
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth()
+  
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="loading-spinner"></div>
+        <h2>Loading...</h2>
+      </div>
+    )
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/login" replace />
+}
+
 function SimulatorFormPage() {
   const [formData, setFormData] = useState(initialFormData)
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -47,6 +68,22 @@ function SimulatorFormPage() {
       <FormSidebar />
 
       <main className="main-content">
+        {/* Auth Header */}
+        <div className="auth-header-bar">
+          {user ? (
+            <div className="user-menu">
+              <span className="user-email">{user.email}</span>
+              <span className={`plan-badge ${user.plan}`}>{user.plan}</span>
+              <button onClick={logout} className="logout-btn">Logout</button>
+            </div>
+          ) : (
+            <div className="auth-links">
+              <a href="/login" className="auth-link">Sign In</a>
+              <a href="/register" className="auth-link primary">Create Account</a>
+            </div>
+          )}
+        </div>
+
         <div className="form-container">
           <div className="form-header">
             <h1>Franchise Form Simulator</h1>
@@ -78,26 +115,45 @@ function SimulatorFormPage() {
   )
 }
 
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/" element={<SimulatorFormPage />} />
+      <Route path="/results" element={<ResultsLayout />}>
+        <Route path="scenarios" element={<SimulateScenariosPage />} />
+        <Route path="profit-risk" element={<ProfitRiskPage />} />
+        <Route path="avoid-mistakes" element={<AvoidMistakesPage />} />
+        <Route path="compare" element={<CompareScenariosPage />} />
+        <Route path="export" element={
+          <ProtectedRoute>
+            <ExportReportsPage />
+          </ProtectedRoute>
+        } />
+        <Route index element={<Navigate to="/results/scenarios" replace />} />
+      </Route>
+      <Route path="/history" element={
+        <ProtectedRoute>
+          <HistoryPage />
+        </ProtectedRoute>
+      } />
+    </Routes>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <SavedScenariosProvider>
-        <ResultsProvider>
-          <Routes>
-            <Route path="/" element={<SimulatorFormPage />} />
-            <Route path="/results" element={<ResultsLayout />}>
-              <Route path="scenarios" element={<SimulateScenariosPage />} />
-              <Route path="profit-risk" element={<ProfitRiskPage />} />
-              <Route path="avoid-mistakes" element={<AvoidMistakesPage />} />
-              <Route path="compare" element={<CompareScenariosPage />} />
-              <Route path="export" element={<ExportReportsPage />} />
-              <Route index element={<Navigate to="/results/scenarios" replace />} />
-            </Route>
-            <Route path="/history" element={<HistoryPage />} />
-          </Routes>
-          <FloatingHistoryButton />
-        </ResultsProvider>
-      </SavedScenariosProvider>
+      <AuthProvider>
+        <SavedScenariosProvider>
+          <ResultsProvider>
+            <AppRoutes />
+            <FloatingHistoryButton />
+          </ResultsProvider>
+        </SavedScenariosProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

@@ -19,6 +19,8 @@
     { "src": "/onboarding.html", "dest": "/public/onboarding.html" },
     { "src": "/onboarding-2.html", "dest": "/public/onboarding-2.html" },
     { "src": "/verify-email", "dest": "/public/verify-email.html" },
+    { "src": "/login", "dest": "/public/login.html" },
+    { "src": "/signup", "dest": "/public/signup.html" },
     { "src": "/", "dest": "/public/landing.html" }
   ]
 }

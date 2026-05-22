@@ -2,24 +2,21 @@
   "name": "franchise-simulator",
   "version": "1.0.0",
   "description": "Franchise Simulator - Full Stack App",
-  "main": "api/index.js",
   "scripts": {
-    "dev": "node api/index.js",
-    "start": "node api/index.js",
-    "build": "echo 'Build complete'"
+    "build": "cd frontend && npm install && npm run build && rm -rf ../public && cp -r dist ../public && cp public/*.html ../public/ && mv ../public/index.html ../public/app.html 2>/dev/null || true",
+    "dev": "cd backend && npm run dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.15",
     "pg": "^8.21.0",
     "stripe": "^18.5.0"
   },
-  "type": "module"
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

@@ -1,6 +1,9 @@
 import { resultSteps } from '../results/resultsData'
+import { useAuth } from '../auth/AuthContext'
 
 export default function FormSidebar() {
+  const { user, isAuthenticated, logout } = useAuth()
+
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
@@ -51,10 +54,97 @@ export default function FormSidebar() {
             </svg>
           </div>
           <div className="profile-info">
-            <span className="profile-name">Dev Account</span>
-            <span className="profile-role">Franchise Investor</span>
+            {isAuthenticated ? (
+              <>
+                <span className="profile-name">{user?.email?.split('@')[0] || 'User'}</span>
+                <span className="profile-role">
+                  {user?.plan === 'pro' ? 'Pro Member' : 'Free Member'}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="profile-name">Guest</span>
+                <span className="profile-role">
+                  <a href="/login" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'underline' }}>
+                    Sign in to save
+                  </a>
+                </span>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Auth Links for non-authenticated users */}
+        {!isAuthenticated && (
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.5rem',
+            marginTop: '0.5rem',
+            padding: '0.75rem',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '8px'
+          }}>
+            <a 
+              href="/login" 
+              style={{ 
+                color: 'white', 
+                fontSize: '0.875rem', 
+                fontWeight: 500,
+                textDecoration: 'none',
+                padding: '0.5rem',
+                textAlign: 'center',
+                borderRadius: '6px',
+                border: '1px solid rgba(255,255,255,0.3)'
+              }}
+            >
+              Sign In
+            </a>
+            <a 
+              href="/register" 
+              style={{ 
+                color: '#4f46e5', 
+                fontSize: '0.875rem', 
+                fontWeight: 600,
+                textDecoration: 'none',
+                padding: '0.5rem',
+                textAlign: 'center',
+                borderRadius: '6px',
+                background: 'white'
+              }}
+            >
+              Create Account
+            </a>
+          </div>
+        )}
+
+        {/* Logout button for authenticated users */}
+        {isAuthenticated && (
+          <button
+            onClick={logout}
+            style={{
+              marginTop: '0.5rem',
+              padding: '0.625rem',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Sign Out
+          </button>
+        )}
       </div>
     </aside>
   )

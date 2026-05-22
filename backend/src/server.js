@@ -5,7 +5,8 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import Stripe from 'stripe'
 import { randomUUID } from 'crypto'
-import { initDb, createUser, getUserByEmail, getUserById, updateUser, createSimulation, getSimulationsByUser, sanitizeUser } from './db.js'
+import { initDb, createUser, getUserByEmail, getUserById, getUserByVerificationToken, updateUser, createSimulation, getSimulationsByUser, sanitizeUser } from './db.js'
+import { sendVerificationEmail, sendWelcomeEmail } from './email.js'
 
 dotenv.config()
 
@@ -26,7 +27,7 @@ async function ensureDb() {
 }
 
 function createToken(user) {
-  return jwt.sign({ sub: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: '7d' })
+  return jwt.sign({ sub: user.id, email: user.email, plan: user.plan, emailVerified: user.email_verified }, JWT_SECRET, { expiresIn: '7d' })
 }
 
 async function authOptional(req, _res, next) {
@@ -48,6 +49,7 @@ async function authOptional(req, _res, next) {
 async function requireAuth(req, res, next) {
   await authOptional(req, res, () => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' })
+    if (!req.user.email_verified) return res.status(403).json({ error: 'Email not verified', needsVerification: true })
     next()
   })
 }
@@ -55,6 +57,7 @@ async function requireAuth(req, res, next) {
 function requirePlan(plan) {
   return (req, res, next) => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' })
+    if (!req.user.email_verified) return res.status(403).json({ error: 'Email not verified', needsVerification: true })
     if (req.user.plan !== plan || req.user.plan_status !== 'active') {
       return res.status(402).json({ error: `Upgrade required: ${plan}` })
     }
@@ -88,7 +91,13 @@ app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), asyn
 
   if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
     const sub = event.data.object
-    const user = await getUserById(sub.customer)
+    // Find user by stripe_customer_id
+    const { getPool } = await import('./db.js')
+    const result = await getPool().query(
+      'SELECT * FROM users WHERE stripe_customer_id = $1',
+      [sub.customer]
+    )
+    const user = result.rows[0]
     if (user) {
       const active = ['active', 'trialing'].includes(sub.status)
       await updateUser(user.id, {
@@ -134,6 +143,7 @@ app.get('/health', async (_req, res) => {
   res.json({ ok: true })
 })
 
+// Register - creates unverified user and sends verification email
 app.post('/api/auth/register', async (req, res) => {
   await ensureDb()
   try {
@@ -147,11 +157,19 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(409).json({ error: 'Email already exists' })
     }
 
+    // Generate verification token
+    const verificationToken = randomUUID()
+    const tokenExpires = new Date()
+    tokenExpires.setHours(tokenExpires.getHours() + 24) // 24 hours expiry
+
     const now = new Date().toISOString()
     const user = {
       id: randomUUID(),
       email: String(email).toLowerCase(),
       passwordHash: await bcrypt.hash(password, 10),
+      emailVerified: false,
+      verificationToken: verificationToken,
+      verificationTokenExpires: tokenExpires.toISOString(),
       plan: 'free',
       planStatus: 'active',
       stripeCustomerId: null,
@@ -161,14 +179,121 @@ app.post('/api/auth/register', async (req, res) => {
 
     await createUser(user)
 
-    const token = createToken(user)
-    res.status(201).json({ token, user: sanitizeUser(user) })
+    // Send verification email
+    try {
+      await sendVerificationEmail(user.email, verificationToken, FRONTEND_URL)
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError)
+      // Continue - user is created, they can request a new verification email
+    }
+
+    res.status(201).json({ 
+      message: 'Registration successful. Please check your email to verify your account.',
+      email: user.email,
+      requiresVerification: true
+    })
   } catch (error) {
     console.error('Register error:', error)
     res.status(500).json({ error: error.message || 'Failed to register' })
   }
 })
 
+// Verify email endpoint
+app.get('/api/auth/verify-email', async (req, res) => {
+  await ensureDb()
+  try {
+    const { token } = req.query
+    
+    if (!token) {
+      return res.status(400).json({ error: 'Verification token is required' })
+    }
+
+    const user = await getUserByVerificationToken(token)
+    
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired verification token' })
+    }
+
+    // Check if token is expired
+    if (new Date(user.verification_token_expires) < new Date()) {
+      return res.status(400).json({ error: 'Verification token has expired', expired: true })
+    }
+
+    // Check if already verified
+    if (user.email_verified) {
+      return res.json({ message: 'Email already verified', alreadyVerified: true })
+    }
+
+    // Mark email as verified
+    await updateUser(user.id, {
+      email_verified: true,
+      verification_token: null,
+      verification_token_expires: null
+    })
+
+    // Send welcome email
+    try {
+      await sendWelcomeEmail(user.email, FRONTEND_URL)
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError)
+    }
+
+    // Generate token for auto-login
+    const authToken = createToken({ ...user, email_verified: true })
+
+    res.json({ 
+      message: 'Email verified successfully!',
+      token: authToken,
+      user: sanitizeUser({ ...user, email_verified: true })
+    })
+  } catch (error) {
+    console.error('Verify email error:', error)
+    res.status(500).json({ error: error.message || 'Failed to verify email' })
+  }
+})
+
+// Resend verification email
+app.post('/api/auth/resend-verification', async (req, res) => {
+  await ensureDb()
+  try {
+    const { email } = req.body || {}
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' })
+    }
+
+    const user = await getUserByEmail(email)
+    
+    if (!user) {
+      // Don't reveal if user exists
+      return res.json({ message: 'If an account exists, a verification email has been sent.' })
+    }
+
+    if (user.email_verified) {
+      return res.json({ message: 'Email already verified', alreadyVerified: true })
+    }
+
+    // Generate new verification token
+    const verificationToken = randomUUID()
+    const tokenExpires = new Date()
+    tokenExpires.setHours(tokenExpires.getHours() + 24)
+
+    await updateUser(user.id, {
+      verification_token: verificationToken,
+      verification_token_expires: tokenExpires.toISOString()
+    })
+
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationToken, FRONTEND_URL)
+
+    res.json({ message: 'Verification email sent. Please check your inbox.' })
+  } catch (error) {
+    console.error('Resend verification error:', error)
+    res.status(500).json({ error: error.message || 'Failed to send verification email' })
+  }
+})
+
+// Login - requires verified email
 app.post('/api/auth/login', async (req, res) => {
   await ensureDb()
   try {
@@ -178,6 +303,15 @@ app.post('/api/auth/login', async (req, res) => {
 
     const ok = await bcrypt.compare(password || '', user.password_hash)
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' })
+
+    // Check if email is verified
+    if (!user.email_verified) {
+      return res.status(403).json({ 
+        error: 'Email not verified', 
+        needsVerification: true,
+        email: user.email
+      })
+    }
 
     const token = createToken(user)
     res.json({ token, user: sanitizeUser(user) })
@@ -333,5 +467,5 @@ ${JSON.stringify(results, null, 2)}
 
 app.listen(PORT, () => {
   console.log(`Backend API running on http://localhost:${PORT}`)
-  console.log(`Using Turso database: ${process.env.DATABASE_URL?.includes('libsql') ? 'Turso Cloud' : 'Local SQLite'}`)
+  console.log(`Using database: ${process.env.DATABASE_URL?.includes('neon') ? 'Neon PostgreSQL' : 'Local'}`)
 })

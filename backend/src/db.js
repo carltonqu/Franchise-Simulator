@@ -5,11 +5,18 @@ dotenv.config()
 
 const { Pool } = pg
 
-// Create PostgreSQL pool
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-})
+// Lazy pool creation
+let pool = null
+
+function getPool() {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    })
+  }
+  return pool
+}
 
 // Track initialization
 let initialized = false
@@ -17,15 +24,19 @@ let initialized = false
 // Initialize database tables
 export async function initDb() {
   if (initialized) return
-  initialized = true
   
   try {
-    // Users table
-    await pool.query(`
+    const client = getPool()
+    
+    // Users table with email verification
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
+        email_verified BOOLEAN DEFAULT false,
+        verification_token TEXT,
+        verification_token_expires TIMESTAMP,
         plan TEXT DEFAULT 'free',
         plan_status TEXT DEFAULT 'active',
         stripe_customer_id TEXT,
@@ -35,7 +46,7 @@ export async function initDb() {
     `)
 
     // Simulations table
-    await pool.query(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS simulations (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL REFERENCES users(id),
@@ -48,6 +59,7 @@ export async function initDb() {
       )
     `)
 
+    initialized = true
     console.log('Database initialized')
   } catch (error) {
     console.error('Database initialization error:', error)
@@ -57,17 +69,17 @@ export async function initDb() {
 
 // User operations
 export async function createUser(user) {
-  const result = await pool.query(
-    `INSERT INTO users (id, email, password_hash, plan, plan_status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+  const result = await getPool().query(
+    `INSERT INTO users (id, email, password_hash, email_verified, verification_token, verification_token_expires, plan, plan_status, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING *`,
-    [user.id, user.email, user.passwordHash, user.plan, user.planStatus, user.createdAt, user.updatedAt]
+    [user.id, user.email, user.passwordHash, user.emailVerified || false, user.verificationToken, user.verificationTokenExpires, user.plan, user.planStatus, user.createdAt, user.updatedAt]
   )
   return result.rows[0]
 }
 
 export async function getUserByEmail(email) {
-  const result = await pool.query(
+  const result = await getPool().query(
     'SELECT * FROM users WHERE email = $1',
     [email.toLowerCase()]
   )
@@ -75,15 +87,23 @@ export async function getUserByEmail(email) {
 }
 
 export async function getUserById(id) {
-  const result = await pool.query(
+  const result = await getPool().query(
     'SELECT * FROM users WHERE id = $1',
     [id]
   )
   return result.rows[0] || null
 }
 
+export async function getUserByVerificationToken(token) {
+  const result = await getPool().query(
+    'SELECT * FROM users WHERE verification_token = $1',
+    [token]
+  )
+  return result.rows[0] || null
+}
+
 export async function updateUser(userId, updates) {
-  const allowedFields = ['plan', 'plan_status', 'stripe_customer_id']
+  const allowedFields = ['plan', 'plan_status', 'stripe_customer_id', 'email_verified', 'verification_token', 'verification_token_expires']
   const setClause = []
   const values = []
   let paramIndex = 1
@@ -99,7 +119,7 @@ export async function updateUser(userId, updates) {
   if (setClause.length === 0) return
   
   values.push(userId)
-  const result = await pool.query(
+  const result = await getPool().query(
     `UPDATE users SET ${setClause.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramIndex} RETURNING *`,
     values
   )
@@ -108,7 +128,7 @@ export async function updateUser(userId, updates) {
 
 // Simulation operations
 export async function createSimulation(simulation) {
-  const result = await pool.query(
+  const result = await getPool().query(
     `INSERT INTO simulations (id, user_id, input_json, result_json, ai_report_json, is_shallow, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
@@ -127,7 +147,7 @@ export async function createSimulation(simulation) {
 }
 
 export async function getSimulationsByUser(userId, limit = 100) {
-  const result = await pool.query(
+  const result = await getPool().query(
     `SELECT * FROM simulations WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2`,
     [userId, limit]
   )
@@ -143,10 +163,11 @@ export async function getSimulationsByUser(userId, limit = 100) {
 // Helper to sanitize user (remove password_hash)
 export function sanitizeUser(user) {
   if (!user) return null
-  const { password_hash, passwordHash, ...safe } = user
+  const { password_hash, passwordHash, verification_token, verification_token_expires, ...safe } = user
   return {
     ...safe,
     plan: safe.plan || 'free',
-    planStatus: safe.plan_status || 'active'
+    planStatus: safe.plan_status || 'active',
+    emailVerified: safe.email_verified || false
   }
 }
