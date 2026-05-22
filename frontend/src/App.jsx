@@ -121,7 +121,7 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
-      <Route path="/" element={<SimulatorFormPage />} />
+      <Route path="/app" element={<SimulatorFormPage />} />
       <Route path="/results" element={<ResultsLayout />}>
         <Route path="scenarios" element={<SimulateScenariosPage />} />
         <Route path="profit-risk" element={<ProfitRiskPage />} />
@@ -139,6 +139,8 @@ function AppRoutes() {
           <HistoryPage />
         </ProtectedRoute>
       } />
+      {/* Redirect any unknown routes to landing page (handled by Vercel) */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

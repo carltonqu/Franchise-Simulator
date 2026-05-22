@@ -8,10 +8,18 @@
     { "source": "/health", "destination": "/api/index.js" },
     { "source": "/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/vite.svg", "destination": "/vite.svg" },
+    { "source": "/app", "destination": "/index.html" },
+    { "source": "/app/(.*)", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/register", "destination": "/index.html" },
+    { "source": "/verify-email", "destination": "/index.html" },
+    { "source": "/results", "destination": "/index.html" },
+    { "source": "/results/(.*)", "destination": "/index.html" },
+    { "source": "/history", "destination": "/index.html" },
     { "source": "/landing.html", "destination": "/landing.html" },
     { "source": "/onboarding.html", "destination": "/onboarding.html" },
     { "source": "/onboarding-2.html", "destination": "/onboarding-2.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/landing.html" }
   ],
   "functions": {
     "api/index.js": {
