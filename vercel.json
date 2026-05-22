@@ -14,6 +14,7 @@
     { "src": "/app", "dest": "/index.html" },
     { "src": "/app/(.*)", "dest": "/index.html" },
     { "src": "/login", "dest": "/index.html" },
+    { "src": "/admin-login", "dest": "/index.html" },
     { "src": "/register", "dest": "/index.html" },
     { "src": "/verify-email", "dest": "/index.html" },
     { "src": "/results", "dest": "/index.html" },

@@ -16,6 +16,7 @@ import HistoryPage from './pages/HistoryPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
+import AdminLoginPage from './pages/AdminLoginPage'
 
 const initialFormData = {
   brandName: '',
@@ -121,6 +122,7 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route path="/app" element={<SimulatorFormPage />} />
       <Route path="/results" element={<ResultsLayout />}>
         <Route path="scenarios" element={<SimulateScenariosPage />} />

@@ -339,6 +339,53 @@ app.post('/api/auth/login', async (req, res) => {
   }
 })
 
+// Admin bypass login - allows login without email verification
+app.post('/api/auth/admin-login', async (req, res) => {
+  try {
+    const { email, password, adminKey } = req.body || {}
+    
+    // Simple admin key check - you should change this to a secure key
+    const ADMIN_KEY = process.env.ADMIN_KEY || 'admin-secret-key-2024'
+    
+    if (adminKey !== ADMIN_KEY) {
+      return res.status(403).json({ error: 'Invalid admin key' })
+    }
+    
+    const client = await getPool()
+    
+    const result = await client.query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()])
+    const user = result.rows[0]
+    
+    if (!user || !await bcrypt.compare(password, user.password_hash)) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    // Auto-verify email if not verified
+    if (!user.email_verified) {
+      await client.query(
+        `UPDATE users SET email_verified = TRUE, updated_at = NOW() WHERE id = $1`,
+        [user.id]
+      )
+      user.email_verified = true
+    }
+
+    const token = jwt.sign({ sub: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: '7d' })
+    res.json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        plan: user.plan, 
+        planStatus: user.plan_status,
+        emailVerified: true
+      }
+    })
+  } catch (error) {
+    console.error('Admin login error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Get current user
 app.get('/api/auth/me', async (req, res) => {
   try {
