@@ -128,11 +128,7 @@ function AppRoutes() {
         <Route path="profit-risk" element={<ProfitRiskPage />} />
         <Route path="avoid-mistakes" element={<AvoidMistakesPage />} />
         <Route path="compare" element={<CompareScenariosPage />} />
-        <Route path="export" element={
-          <ProtectedRoute>
-            <ExportReportsPage />
-          </ProtectedRoute>
-        } />
+        <Route path="export" element={<ExportReportsPage />} />
         <Route index element={<Navigate to="/results/scenarios" replace />} />
       </Route>
       <Route path="/history" element={
