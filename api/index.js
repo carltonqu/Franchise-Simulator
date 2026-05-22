@@ -69,19 +69,76 @@ async function getPool() {
   return pool
 }
 
-// Simple email sending function (mock for now, can be replaced with real service)
+// Resend email sending function
 async function sendVerificationEmail(email, token) {
   const verificationUrl = `${process.env.FRONTEND_URL || 'https://franchise-simulator.vercel.app'}/verify-email?token=${token}`
   
-  // Log for debugging (in production, use a real email service like SendGrid, AWS SES, etc.)
-  console.log('========================================')
-  console.log('EMAIL VERIFICATION')
-  console.log('To:', email)
-  console.log('Verification URL:', verificationUrl)
-  console.log('========================================')
+  const RESEND_API_KEY = process.env.RESEND_API_KEY
+  const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev'
   
-  // Return the URL so the frontend can display it in development
-  return { success: true, verificationUrl }
+  if (!RESEND_API_KEY) {
+    console.log('========================================')
+    console.log('EMAIL VERIFICATION (NO API KEY - LOGGING ONLY)')
+    console.log('To:', email)
+    console.log('Verification URL:', verificationUrl)
+    console.log('========================================')
+    return { success: true, verificationUrl, mock: true }
+  }
+  
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: email,
+        subject: 'Verify your email for Franchise Simulator',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #6366f1;">Welcome to Franchise Simulator!</h2>
+            <p>Thank you for creating an account. Please verify your email address to start using the app.</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${verificationUrl}" 
+                 style="background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); 
+                        color: white; 
+                        padding: 14px 28px; 
+                        text-decoration: none; 
+                        border-radius: 8px; 
+                        font-weight: 600;
+                        display: inline-block;">
+                Verify Email Address
+              </a>
+            </div>
+            <p style="color: #6b7280; font-size: 14px;">
+              Or copy and paste this link into your browser:<br>
+              <a href="${verificationUrl}" style="color: #6366f1;">${verificationUrl}</a>
+            </p>
+            <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+              This link will expire in 24 hours. If you didn't create an account, you can safely ignore this email.
+            </p>
+          </div>
+        `,
+        text: `Welcome to Franchise Simulator!\n\nThank you for creating an account. Please verify your email address to start using the app.\n\nClick the link below to verify your email:\n${verificationUrl}\n\nThis link will expire in 24 hours. If you didn't create an account, you can safely ignore this email.`
+      })
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Resend API error:', error)
+      throw new Error('Failed to send email')
+    }
+    
+    const data = await response.json()
+    console.log('Email sent successfully:', data.id)
+    return { success: true, emailId: data.id }
+  } catch (error) {
+    console.error('Failed to send email:', error)
+    // Still return success but log the error - user can request resend
+    return { success: true, verificationUrl, error: error.message }
+  }
 }
 
 // Health check - simple version
