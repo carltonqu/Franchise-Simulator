@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Franchise Simulator - Full Stack App",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build && rm -rf ../public && cp -r dist ../public",
+    "build": "cd frontend && npm install && npm run build && cp public/landing.html dist/ && rm -rf ../public && cp -r dist ../public",
     "dev": "cd backend && npm run dev"
   },
   "dependencies": {
