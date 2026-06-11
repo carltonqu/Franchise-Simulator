@@ -21,8 +21,8 @@ export default function HistoryPage() {
     <div className="app-container">
       <FormSidebar />
       
-      <main className="main-content">
-        <div className="results-container">
+      <main className="main-content" style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="results-container" style={{ width: '100%', maxWidth: '1000px' }}>
           <section className="results-section">
             <div className="results-header" style={{ textAlign: 'center' }}>
               <h1>History</h1>
