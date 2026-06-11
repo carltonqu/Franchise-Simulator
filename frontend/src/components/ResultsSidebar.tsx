@@ -1,9 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { resultSteps } from '../results/resultsData'
+import { useAuth } from '../auth/AuthContext'
 
 export default function ResultsSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { user, isAuthenticated, logout } = useAuth()
   const currentStepIndex = resultSteps.findIndex((step) => step.path === location.pathname)
 
   const handleGoBack = () => {
@@ -65,7 +67,7 @@ export default function ResultsSidebar() {
           })}
         </nav>
 
-        {/* Profile Account Section */}
+        {/* Profile Account Section - Shows user info when logged in, Guest when not */}
         <div className="sidebar-profile">
           <div className="profile-avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -74,10 +76,92 @@ export default function ResultsSidebar() {
             </svg>
           </div>
           <div className="profile-info">
-            <span className="profile-name">Dev Account</span>
-            <span className="profile-role">Franchise Investor</span>
+            {isAuthenticated ? (
+              <>
+                <span className="profile-name">{user?.email?.split('@')[0] || 'User'}</span>
+                <span className="profile-role">{user?.plan === 'pro' ? 'Pro Member' : 'Free Member'}</span>
+              </>
+            ) : (
+              <>
+                <span className="profile-name">Guest</span>
+                <span className="profile-role">
+                  <a href="/login" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'underline' }}>
+                    Sign in to save
+                  </a>
+                </span>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Auth buttons for guests / Logout for authenticated users */}
+        {isAuthenticated ? (
+          <button
+            onClick={logout}
+            style={{
+              marginTop: '0.5rem',
+              padding: '0.625rem',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Sign Out
+          </button>
+        ) : (
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.5rem',
+            marginTop: '0.5rem',
+            padding: '0.75rem',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '8px'
+          }}>
+            <a 
+              href="/login" 
+              style={{ 
+                color: 'white', 
+                fontSize: '0.875rem', 
+                fontWeight: 500,
+                textDecoration: 'none',
+                padding: '0.5rem',
+                textAlign: 'center',
+                borderRadius: '6px',
+                border: '1px solid rgba(255,255,255,0.3)'
+              }}
+            >
+              Sign In
+            </a>
+            <a 
+              href="/register" 
+              style={{ 
+                color: '#4f46e5', 
+                fontSize: '0.875rem', 
+                fontWeight: 600,
+                textDecoration: 'none',
+                padding: '0.5rem',
+                textAlign: 'center',
+                borderRadius: '6px',
+                background: 'white'
+              }}
+            >
+              Create Account
+            </a>
+          </div>
+        )}
 
         {/* Go Back Button */}
         <button className="go-back-btn" onClick={handleGoBack}>
