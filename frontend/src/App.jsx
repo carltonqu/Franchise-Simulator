@@ -128,10 +128,10 @@ function RootRoute() {
     )
   }
   
-  // If authenticated, go to onboarding (which then leads to app)
+  // If authenticated, go directly to simulator (skip onboarding)
   // If not authenticated, go to login
   return isAuthenticated 
-    ? <Navigate to="/onboarding.html" replace />
+    ? <Navigate to="/app" replace />
     : <Navigate to="/login" replace />
 }
 

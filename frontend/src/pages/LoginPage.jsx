@@ -23,8 +23,8 @@ export default function LoginPage() {
     const result = await login(email, password)
     
     if (result.success) {
-      // Redirect to onboarding page after successful login
-      window.location.href = '/onboarding.html'
+      // Redirect to simulator page after successful login
+      window.location.href = '/app'
     } else if (result.needsVerification) {
       setNeedsVerification(true)
     }

@@ -84,7 +84,7 @@ export default function VerifyEmailPage() {
               <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
                 Your account is now active. You can start using the Franchise Simulator.
               </p>
-              <a href="/onboarding.html" className="auth-btn" style={{ textDecoration: 'none', display: 'inline-block' }}>
+              <a href="/app" className="auth-btn" style={{ textDecoration: 'none', display: 'inline-block' }}>
                 Start Simulating
               </a>
             </div>
