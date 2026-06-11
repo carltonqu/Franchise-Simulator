@@ -153,7 +153,8 @@ export default function HistoryPage() {
                         padding: '1.5rem',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         border: '1px solid #e5e7eb',
-                        display: 'flex',
+                        display: 'grid',
+                        gridTemplateColumns: 'auto 1fr auto',
                         alignItems: 'center',
                         gap: '1.5rem',
                         transition: 'all 0.2s',
@@ -171,13 +172,14 @@ export default function HistoryPage() {
                         justifyContent: 'center',
                         fontSize: '1.25rem',
                         fontWeight: 700,
-                        flexShrink: 0
+                        flexShrink: 0,
+                        alignSelf: 'center'
                       }}>
                         {savedScenarios.length - index}
                       </div>
                       
                       {/* Main Content */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ minWidth: 0 }}>
                         {/* Header Row */}
                         <div style={{ 
                           display: 'flex', 
@@ -270,7 +272,8 @@ export default function HistoryPage() {
                         display: 'flex', 
                         flexDirection: 'column', 
                         gap: '0.5rem',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        alignSelf: 'center'
                       }}>
                         <button 
                           onClick={() => navigate(`/results/compare?highlight=${scenario.id}`)}
