@@ -25,7 +25,7 @@ export default function ResultsSidebar() {
         </div>
 
         {/* Steps List */}
-        <nav className="feature-list">
+        <nav className="feature-list" style={{ flex: 'none' }}>
           {resultSteps.map((step, index) => {
             const stepNumber = index + 1
             const isActive = index === currentStepIndex
