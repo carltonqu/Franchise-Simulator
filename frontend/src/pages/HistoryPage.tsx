@@ -21,8 +21,8 @@ export default function HistoryPage() {
     <div className="app-container">
       <FormSidebar />
       
-      <main className="main-content" style={{ display: 'flex', justifyContent: 'center' }}>
-        <div className="results-container" style={{ width: '100%', maxWidth: '1000px' }}>
+      <main className="main-content">
+        <div className="results-container" style={{ width: '100%' }}>
           <section className="results-section">
             <div className="results-header" style={{ textAlign: 'center' }}>
               <h1>History</h1>
@@ -73,7 +73,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                <div className="history-list" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                <div className="history-list" style={{ width: '100%' }}>
                   {savedScenarios.map((scenario, index) => (
                     <div key={scenario.id} className="history-item">
                       <div className="history-number">{savedScenarios.length - index}</div>
