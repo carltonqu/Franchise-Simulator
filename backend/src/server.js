@@ -180,17 +180,22 @@ app.post('/api/auth/register', async (req, res) => {
     await createUser(user)
 
     // Send verification email
+    let emailSent = false
     try {
       await sendVerificationEmail(user.email, verificationToken, FRONTEND_URL)
+      emailSent = true
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError)
       // Continue - user is created, they can request a new verification email
     }
 
     res.status(201).json({ 
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: emailSent 
+        ? 'Registration successful. Please check your email to verify your account.'
+        : 'Registration successful but email failed to send. Please use the resend option.',
       email: user.email,
-      requiresVerification: true
+      requiresVerification: true,
+      emailSent
     })
   } catch (error) {
     console.error('Register error:', error)

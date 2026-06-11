@@ -2,8 +2,15 @@ import nodemailer from 'nodemailer';
 
 // Create transporter based on environment variables
 function createTransporter() {
+  console.log('Creating email transporter...');
+  console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+  console.log('SENDGRID_API_KEY exists:', !!process.env.SENDGRID_API_KEY);
+  console.log('GMAIL_USER exists:', !!process.env.GMAIL_USER);
+  console.log('ETHEREAL_USER exists:', !!process.env.ETHEREAL_USER);
+  
   // Use Resend if API key is available (recommended for production)
   if (process.env.RESEND_API_KEY) {
+    console.log('Using Resend email service');
     return nodemailer.createTransport({
       host: 'smtp.resend.com',
       port: 465,
@@ -17,6 +24,7 @@ function createTransporter() {
 
   // Use SendGrid if API key is available
   if (process.env.SENDGRID_API_KEY) {
+    console.log('Using SendGrid email service');
     return nodemailer.createTransport({
       host: 'smtp.sendgrid.net',
       port: 587,
@@ -29,6 +37,7 @@ function createTransporter() {
 
   // Use Gmail if configured
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    console.log('Using Gmail email service');
     return nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -39,15 +48,22 @@ function createTransporter() {
   }
 
   // Ethereal for testing (development only)
-  console.log('No email service configured. Using Ethereal for testing...');
-  return nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-      user: process.env.ETHEREAL_USER,
-      pass: process.env.ETHEREAL_PASS,
-    },
-  });
+  if (process.env.ETHEREAL_USER && process.env.ETHEREAL_PASS) {
+    console.log('Using Ethereal email service for testing');
+    return nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      auth: {
+        user: process.env.ETHEREAL_USER,
+        pass: process.env.ETHEREAL_PASS,
+      },
+    });
+  }
+  
+  // No email service configured
+  console.error('ERROR: No email service configured!');
+  console.error('Please set one of: RESEND_API_KEY, SENDGRID_API_KEY, GMAIL_USER+GMAIL_APP_PASSWORD, or ETHEREAL_USER+ETHEREAL_PASS');
+  throw new Error('No email service configured');
 }
 
 const transporter = createTransporter();
