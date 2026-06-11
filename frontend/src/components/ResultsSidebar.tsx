@@ -14,7 +14,7 @@ export default function ResultsSidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-content">
+      <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Logo */}
         <div className="sidebar-logo">
           <div className="logo-icon">
@@ -67,37 +67,81 @@ export default function ResultsSidebar() {
           })}
         </nav>
 
-        {/* Profile Account Section - Only shows when logged in */}
+        {/* Spacer to push profile to bottom */}
+        <div style={{ flex: 1 }} />
+
+        {/* Profile Section at Bottom - Only shows when logged in */}
         {isAuthenticated && (
-          <>
-            <div className="sidebar-profile">
-              <div className="profile-avatar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div style={{
+            marginTop: '1.5rem',
+            padding: '1rem',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}>
+            {/* Profile Avatar and Email */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '0.75rem'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
               </div>
-              <div className="profile-info">
-                <span className="profile-name">{user?.email?.split('@')[0] || 'User'}</span>
-                <span className="profile-role">{user?.plan === 'pro' ? 'Pro Member' : 'Free Member'}</span>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'
+              }}>
+                <span style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  color: 'white',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {user?.email || 'User'}
+                </span>
+                <span style={{
+                  fontSize: '0.75rem',
+                  color: 'rgba(255,255,255,0.7)'
+                }}>
+                  {user?.plan === 'pro' ? 'Pro Member' : 'Free Member'}
+                </span>
               </div>
             </div>
 
+            {/* Logout Button */}
             <button
               onClick={logout}
               style={{
-                marginTop: '0.5rem',
+                width: '100%',
                 padding: '0.625rem',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.3)',
                 borderRadius: '8px',
                 color: 'white',
                 fontSize: '0.875rem',
+                fontWeight: 500,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                transition: 'all 0.2s'
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -105,21 +149,9 @@ export default function ResultsSidebar() {
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
               </svg>
-              Sign Out
+              Logout
             </button>
-          </>
-        )}
-
-        {/* Logout Button */}
-        {isAuthenticated && (
-          <button className="go-back-btn" onClick={logout}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-          </button>
+          </div>
         )}
       </div>
     </aside>
