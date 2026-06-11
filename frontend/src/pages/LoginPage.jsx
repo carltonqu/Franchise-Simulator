@@ -23,7 +23,8 @@ export default function LoginPage() {
     const result = await login(email, password)
     
     if (result.success) {
-      navigate('/')
+      // Redirect to onboarding page after successful login
+      window.location.href = '/onboarding.html'
     } else if (result.needsVerification) {
       setNeedsVerification(true)
     }

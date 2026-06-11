@@ -115,9 +115,30 @@ function SimulatorFormPage() {
   )
 }
 
+// Root route handler - redirects based on auth status
+function RootRoute() {
+  const { isAuthenticated, loading } = useAuth()
+  
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="loading-spinner"></div>
+        <h2>Loading...</h2>
+      </div>
+    )
+  }
+  
+  // If authenticated, go to onboarding (which then leads to app)
+  // If not authenticated, go to login
+  return isAuthenticated 
+    ? <Navigate to="/onboarding.html" replace />
+    : <Navigate to="/login" replace />
+}
+
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<RootRoute />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
