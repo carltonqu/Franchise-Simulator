@@ -1,9 +1,20 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useSavedScenarios } from '../results/SavedScenariosContext'
 
 export default function FloatingHistoryButton() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { savedScenarios } = useSavedScenarios()
+
+  // Hide on login, register, and onboarding pages
+  const hiddenPaths = ['/login', '/register', '/admin-login']
+  const isHiddenPage = hiddenPaths.includes(location.pathname) || 
+                       location.pathname.startsWith('/onboarding') ||
+                       location.pathname === '/'
+
+  if (isHiddenPage) {
+    return null
+  }
 
   return (
     <button
