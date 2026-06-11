@@ -255,11 +255,11 @@ app.get('/api/auth/verify-email', async (req, res) => {
       [user.id]
     )
 
-    const token = jwt.sign({ sub: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: '7d' })
+    const authToken = jwt.sign({ sub: user.id, email: user.email, plan: user.plan }, JWT_SECRET, { expiresIn: '7d' })
     
     res.json({ 
       message: 'Email verified successfully!',
-      token,
+      token: authToken,
       user: { id: user.id, email: user.email, plan: user.plan, planStatus: user.plan_status }
     })
   } catch (error) {
