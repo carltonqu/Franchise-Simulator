@@ -24,13 +24,20 @@ export default function HistoryPage() {
       <main className="main-content">
         <div className="results-container">
           <section className="results-section">
-            <div className="results-header">
+            <div className="results-header" style={{ textAlign: 'center' }}>
               <h1>History</h1>
               <p>All your saved franchise simulation scenarios</p>
+              <button 
+                className="nav-btn next" 
+                onClick={() => navigate('/app')}
+                style={{ marginTop: '1rem' }}
+              >
+                Simulate Again
+              </button>
             </div>
 
             {savedScenarios.length === 0 ? (
-              <div className="result-card full-width empty-state">
+              <div className="result-card full-width empty-state" style={{ textAlign: 'center' }}>
                 <div className="empty-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -47,7 +54,7 @@ export default function HistoryPage() {
               </div>
             ) : (
               <>
-                <div className="history-stats">
+                <div className="history-stats" style={{ justifyContent: 'center' }}>
                   <div className="result-card">
                     <span className="result-label">Total Scenarios</span>
                     <span className="result-value">{savedScenarios.length}</span>
@@ -66,7 +73,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                <div className="history-list">
+                <div className="history-list" style={{ maxWidth: '900px', margin: '0 auto' }}>
                   {savedScenarios.map((scenario, index) => (
                     <div key={scenario.id} className="history-item">
                       <div className="history-number">{savedScenarios.length - index}</div>
