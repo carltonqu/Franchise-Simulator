@@ -123,14 +123,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="social-login">
-            <div className="social-buttons">
-              <button className="social-btn google">G</button>
-              <button className="social-btn facebook">f</button>
-              <button className="social-btn apple">🍎</button>
-            </div>
-          </div>
-
           <p className="auth-switch">
             Don't have an account? <Link to="/register">Sign Up</Link>
           </p>

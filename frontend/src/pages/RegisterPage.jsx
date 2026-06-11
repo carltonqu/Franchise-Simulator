@@ -145,14 +145,6 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="social-login">
-            <div className="social-buttons">
-              <button className="social-btn google">G</button>
-              <button className="social-btn facebook">f</button>
-              <button className="social-btn apple">🍎</button>
-            </div>
-          </div>
-
           <p className="auth-switch">
             Already have an account? <Link to="/login">Login</Link>
           </p>
