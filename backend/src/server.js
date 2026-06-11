@@ -140,7 +140,16 @@ const extractJson = (raw) => {
 
 app.get('/health', async (_req, res) => {
   await ensureDb()
-  res.json({ ok: true })
+  res.json({ 
+    ok: true,
+    email: {
+      resend: !!process.env.RESEND_API_KEY,
+      sendgrid: !!process.env.SENDGRID_API_KEY,
+      gmail: !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD),
+      ethereal: !!(process.env.ETHEREAL_USER && process.env.ETHEREAL_PASS),
+      fromEmail: process.env.FROM_EMAIL || 'not set'
+    }
+  })
 })
 
 // Register - creates unverified user and sends verification email
