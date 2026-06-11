@@ -67,7 +67,7 @@ export default function LoginPage() {
       <div className="auth-form-container">
         <div className="auth-form-wrapper">
           <h1>Welcome to VentureIQ!</h1>
-          <p className="auth-subtitle">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy</p>
+          <p className="auth-subtitle">Sign in to access your saved simulations and continue evaluating franchise opportunities with AI-powered insights.</p>
 
           <form onSubmit={handleSubmit} className="auth-form-modern">
             {error && !needsVerification && (

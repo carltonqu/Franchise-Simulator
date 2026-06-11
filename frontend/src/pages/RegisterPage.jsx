@@ -94,7 +94,7 @@ export default function RegisterPage() {
       <div className="auth-form-container">
         <div className="auth-form-wrapper">
           <h1>Create an account</h1>
-          <p className="auth-subtitle">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy</p>
+          <p className="auth-subtitle">Create an account to start simulating franchise scenarios and make smarter investment decisions with AI-powered analysis.</p>
 
           <form onSubmit={handleSubmit} className="auth-form-modern">
             {(error || validationError) && (

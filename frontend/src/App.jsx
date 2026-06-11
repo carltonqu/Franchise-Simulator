@@ -87,7 +87,7 @@ function SimulatorFormPage() {
         <div className="form-container">
           <div className="form-header">
             <h1>Franchise Form Simulator</h1>
-            <p>Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy Lorem ipsum is simply dummy</p>
+            <p>Enter your franchise details below to simulate potential outcomes. Our AI analyzes your investment, costs, and projected revenue to help you make informed decisions.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="simulator-form">
@@ -107,7 +107,7 @@ function SimulatorFormPage() {
             </div>
 
             <button type="submit" className="run-simulator-btn">Simulate</button>
-            <p className="form-footer-text">Lorem ipsum is simply dummy text of the printing and typesetting industry.</p>
+            <p className="form-footer-text">All calculations are estimates based on industry data. Actual results may vary.</p>
           </form>
         </div>
       </main>
