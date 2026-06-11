@@ -152,11 +152,7 @@ function AppRoutes() {
         <Route path="export" element={<ExportReportsPage />} />
         <Route index element={<Navigate to="/results/scenarios" replace />} />
       </Route>
-      <Route path="/history" element={
-        <ProtectedRoute>
-          <HistoryPage />
-        </ProtectedRoute>
-      } />
+      <Route path="/history" element={<HistoryPage />} />
       {/* Redirect any unknown routes to landing page (handled by Vercel) */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

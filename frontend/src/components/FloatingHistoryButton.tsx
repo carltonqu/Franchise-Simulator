@@ -1,16 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { useSavedScenarios } from '../results/SavedScenariosContext'
-import { useAuth } from '../auth/AuthContext'
 
 export default function FloatingHistoryButton() {
   const navigate = useNavigate()
   const { savedScenarios } = useSavedScenarios()
-  const { isAuthenticated } = useAuth()
-
-  // Only show history button for logged-in users
-  if (!isAuthenticated) {
-    return null
-  }
 
   return (
     <button
